@@ -25,6 +25,7 @@ import {
   formatPriceFcfa,
 } from '../../utils/marketplaceLogic';
 import { useModalAccessibility } from '../../utils/useModalAccessibility';
+import { soundFx } from '../../utils/soundService';
 import { PaymentMethodIcon } from '../icons/BrandIcons';
 import { ResilientImage } from '../ResilientImage';
 import { ProductCard } from './ProductCard';
@@ -88,7 +89,36 @@ export function ProductDetailView({
   const images = product.images.length > 0 ? product.images : [''];
   const currentImage = images[imageIdx] ?? images[0];
 
+  // Bind currently viewed image to OpenGraph and Twitter meta tags in real-time
+  useEffect(() => {
+    const origin = window.location.origin;
+    const imageUrl = currentImage.startsWith('http') ? currentImage : `${origin}${currentImage}`;
+    const setMeta = (propertyAttr: string, attrName: string, value: string) => {
+      let el = document.querySelector(`meta[${propertyAttr}="${attrName}"]`);
+      if (el) el.setAttribute('content', value);
+    };
+    setMeta('property', 'og:image', imageUrl);
+    setMeta('property', 'og:image:secure_url', imageUrl);
+    setMeta('name', 'twitter:image', imageUrl);
+  }, [currentImage]);
+
   const handleShare = async () => {
+    soundFx.playSuccess();
+    const shareData = {
+      title: `${product.name} — Goma`,
+      text: `${product.name} (${formatPriceFcfa(product.priceFcfa)}) sur Goma Delano Collection au Bénin.`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+    } catch {
+      // User cancelled share or unsupported
+    }
+
     try {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(window.location.href);

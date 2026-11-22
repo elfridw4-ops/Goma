@@ -23,6 +23,7 @@ import {
   calculateCartTotals,
   createProductFromDraft,
   filterAndSortProducts,
+  formatPriceFcfa,
   parseUrlSearchState,
   removeFromCart,
   toggleWishlistItem,
@@ -254,25 +255,41 @@ export default function App() {
     aiTab,
   ]);
 
-  // Dynamic <title> reflecting the current view
+  // Dynamic metadata & OpenGraph / Twitter preview tags updater for sharing
   useEffect(() => {
-    let nextTitle = 'Goma — Delano Collection';
+    const origin = window.location.origin;
+    let nextTitle = 'Goma — Delano Collection | Marketplace & Assistance IA';
+    let nextDescription = 'DELANO COLLECTION, votre référence en vêtements et accessoires sur la marketplace Goma avec assistance IA personnalisée au Bénin.';
+    let imageUrl = `${origin}/og-image.png`;
+
     switch (route.view) {
       case 'vitrine':
         nextTitle = 'Goma — Delano Collection · Vitrine éditoriale';
+        nextDescription = 'Découvrez l’univers de la maison Goma, ses collections exclusives Delano Collection et la marketplace au Bénin.';
+        imageUrl = `${origin}/og-image.png`;
         break;
       case 'market-home':
         nextTitle = `Marketplace Goma (${condition === 'frip' ? 'Friperie' : 'Neuf'}) · Delano Collection`;
+        nextDescription = 'Achetez et vendez des vêtements neufs et friperie 1er choix au Bénin avec paiement Mobile Money.';
+        imageUrl = `${origin}/og-image.png`;
         break;
       case 'market-catalogue':
         nextTitle =
           selectedSegment !== 'Tous'
             ? `Catalogue ${selectedSegment} — Marketplace Goma`
             : 'Catalogue complet — Marketplace Goma';
+        nextDescription = 'Parcourez notre sélection rigoureuse de pièces neuves et de friperie validées par nos boutiques partenaires à Cotonou et Calavi.';
+        imageUrl = `${origin}/og-image.png`;
         break;
       case 'market-product': {
         const prod = products.find((p) => p.id === route.productId);
-        nextTitle = prod ? `${prod.name} — Marketplace Goma` : 'Fiche produit — Goma';
+        if (prod) {
+          nextTitle = `${prod.name} — ${formatPriceFcfa(prod.priceFcfa)} | Goma`;
+          nextDescription = `${prod.description} · ${prod.material} · Tailles: ${prod.sizes.join(', ')} · Livraison Bénin.`;
+          if (prod.images && prod.images.length > 0) {
+            imageUrl = prod.images[0].startsWith('http') ? prod.images[0] : `${origin}${prod.images[0]}`;
+          }
+        }
         break;
       }
       case 'market-cart':
@@ -289,9 +306,40 @@ export default function App() {
           aiTab === 'seller'
             ? 'Vendre une pièce — Marketplace Goma'
             : 'Conseiller Acheteur IA — Marketplace Goma';
+        nextDescription = 'Discutez avec l’assistant IA Goma pour trouver la silhouette parfaite ou mettre en ligne votre pièce en 2 minutes.';
         break;
     }
+
     document.title = nextTitle;
+
+    const setMeta = (propertyAttr: string, attrName: string, value: string) => {
+      let el = document.querySelector(`meta[${propertyAttr}="${attrName}"]`);
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(propertyAttr, attrName);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', value);
+    };
+
+    setMeta('property', 'og:title', nextTitle);
+    setMeta('property', 'og:description', nextDescription);
+    setMeta('property', 'og:image', imageUrl);
+    setMeta('property', 'og:image:secure_url', imageUrl);
+    setMeta('property', 'og:url', window.location.href);
+
+    setMeta('name', 'twitter:title', nextTitle);
+    setMeta('name', 'twitter:description', nextDescription);
+    setMeta('name', 'twitter:image', imageUrl);
+    setMeta('name', 'description', nextDescription);
+
+    let canon = document.querySelector('link[rel="canonical"]');
+    if (!canon) {
+      canon = document.createElement('link');
+      canon.setAttribute('rel', 'canonical');
+      document.head.appendChild(canon);
+    }
+    canon.setAttribute('href', window.location.href);
   }, [route, condition, selectedSegment, aiTab, products]);
 
   // Manage toast auto-dismiss timer cleanly with pause on hover/focus
