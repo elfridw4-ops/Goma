@@ -38,25 +38,22 @@ export function VitrineHeader({ onEnterMarketplace }: VitrineHeaderProps) {
 
   return (
     <header
-      className={`fixed top-0 inset-x-0 z-50 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+      className={`fixed top-0 inset-x-0 z-[100] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
         hidden && !mobileMenuOpen ? '-translate-y-full' : 'translate-y-0'
       }`}
     >
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6 pt-3 sm:pt-4">
         <div
-          style={{
-            WebkitBackdropFilter: 'blur(20px) saturate(150%)',
-            backdropFilter: 'blur(20px) saturate(150%)',
-          }}
           className={`flex items-center justify-between gap-3 md:gap-8 rounded-2xl border px-4 sm:px-5 py-3 shadow-layer-sm transition-colors duration-300 ${
             isLightGlass
-              ? 'border-[#2B211B]/12 bg-[#F2E9DA]/65 text-[#201F1C]'
-              : 'border-[#F2E9DA]/20 bg-[#2B211B]/45 text-[#FDFCFB]'
+              ? 'glass-surface-light border-[#2B211B]/12 text-[#201F1C]'
+              : 'glass-surface-dark border-[#F2E9DA]/20 text-[#FDFCFB]'
           }`}
         >
           {/* Zone 1: Brand mark + single-line wordmark */}
           <a
             href="#accueil"
+            translate="no"
             className={`inline-flex items-center gap-2 font-display text-xl font-bold tracking-tight whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-[#C08A2E] focus-visible:outline-offset-2 rounded ${
               isLightGlass ? 'text-[#2B211B]' : 'text-[#FDFCFB]'
             }`}
@@ -123,11 +120,7 @@ export function VitrineHeader({ onEnterMarketplace }: VitrineHeaderProps) {
         {mobileMenuOpen && (
           <nav
             aria-label="Navigation vitrine mobile"
-            style={{
-              WebkitBackdropFilter: 'blur(20px) saturate(150%)',
-              backdropFilter: 'blur(20px) saturate(150%)',
-            }}
-            className="md:hidden mt-2 rounded-2xl border border-[#2B211B]/12 bg-[#F2E9DA]/85 p-4 shadow-layer-md flex flex-col gap-1"
+            className="md:hidden mt-2 rounded-2xl border border-[#2B211B]/12 glass-surface-light p-4 shadow-layer-md flex flex-col gap-1"
           >
             {NAV_LINKS.map((link) => (
               <a

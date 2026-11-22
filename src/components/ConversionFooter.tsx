@@ -40,10 +40,13 @@ export function ConversionFooter({ onEnterMarketplace }: ConversionFooterProps) 
 
         <div className="pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-[#F2E9DA]/70">
           <p className="font-body">
-            <strong className="font-display text-sm text-[#FDFCFB] mr-2">
+            <strong
+              translate="no"
+              className="font-display text-sm text-[#FDFCFB] mr-2"
+            >
               Goma
             </strong>
-            © 2026 Delano Collection — Vitrine &amp; Marketplace vêtements et accessoires.
+            © 2026 <span translate="no">Delano Collection</span> — Vitrine &amp; Marketplace vêtements et accessoires.
           </p>
 
           <div className="flex flex-wrap items-center gap-6">

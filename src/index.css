@@ -32,12 +32,22 @@
   --color-accent: #C08A2E;
   --color-clay: #7A5B45;
   --color-border: #E7E2D9;
+  --color-focus: #8A5A36;
   --text-high: #201F1C;
   --text-medium: #44403C;
   --text-muted: #78716C;
+
+  /* Declared systemic z-index scale */
+  --z-background: 0;
+  --z-default: 1;
+  --z-sticky: 100;
+  --z-dropdown: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+
   --shadow-sm: 0 1px 2px 0 rgba(43, 33, 27, 0.05), 0 1px 3px 1px rgba(43, 33, 27, 0.03);
   --shadow-md: 0 4px 6px -1px rgba(43, 33, 27, 0.07), 0 2px 4px -2px rgba(43, 33, 27, 0.05);
-  --shadow-lg: 0 10px 25px -4px rgba(43, 33, 27, 0.12), 0 4px 10px -4px rgba(43, 33, 27, 0.06);
+  --shadow-lg: 0 10px 25px -4px rgba(43, 33, 27, 0.14), 0 4px 10px -4px rgba(43, 33, 27, 0.07);
 }
 
 html {
@@ -47,6 +57,8 @@ html {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
 }
 
 body {
@@ -54,6 +66,32 @@ body {
   background-color: var(--bg-canvas);
   color: var(--text-high);
   overflow-x: clip;
+}
+
+section[id],
+footer[id] {
+  scroll-margin-top: 5.5rem;
+}
+
+/* Global accessible focus ring aligned with Argile & Moutarde palette */
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Prevent iOS Safari automatic zoom on < 16px form fields */
+@media (max-width: 639px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* Explicit select background/text colors for Windows high-contrast / dark mode resilience */
+select {
+  background-color: #FFFFFF;
+  color: #201F1C;
 }
 
 h1, h2, h3, h4, .font-display {
@@ -83,6 +121,41 @@ h1, h2, h3, h4, .font-display {
 
 .shadow-layer-lg {
   box-shadow: var(--shadow-lg);
+}
+
+.contain-grid {
+  contain: layout paint;
+}
+
+/* Translucent glass surfaces with mandatory opaque @supports fallbacks */
+.glass-surface-light {
+  background-color: rgba(242, 233, 218, 0.72);
+  -webkit-backdrop-filter: blur(20px) saturate(1.55);
+  backdrop-filter: blur(20px) saturate(1.55);
+}
+
+.glass-surface-dark {
+  background-color: rgba(43, 33, 27, 0.52);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  backdrop-filter: blur(20px) saturate(1.5);
+}
+
+.glass-surface-toast {
+  background-color: rgba(43, 33, 27, 0.92);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-surface-light {
+    background-color: rgba(242, 233, 218, 0.96);
+  }
+  .glass-surface-dark {
+    background-color: rgba(43, 33, 27, 0.94);
+  }
+  .glass-surface-toast {
+    background-color: rgba(43, 33, 27, 0.98);
+  }
 }
 
 /* Subtle organic grain texture preventing digital banding */

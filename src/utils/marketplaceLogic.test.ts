@@ -179,3 +179,42 @@ test('wishlist supports local toggling and deduplicated account synchronization 
   ]);
 });
 
+import {
+  buildUrlWithSearchState,
+  parseUrlSearchState,
+} from './marketplaceLogic';
+
+test('URL search state serializes and parses filters and assistant tab safely', () => {
+  const url = buildUrlWithSearchState('/market/catalogue', {
+    etat: 'neuf',
+    segment: 'Femme',
+    q: 'lin',
+    sort: 'price-asc',
+  });
+  assert.equal(
+    url,
+    '/market/catalogue?etat=neuf&segment=Femme&q=lin&sort=price-asc',
+  );
+
+  const parsed = parseUrlSearchState('?etat=neuf&segment=Femme&q=lin&sort=price-asc');
+  assert.deepEqual(parsed, {
+    etat: 'neuf',
+    segment: 'Femme',
+    q: 'lin',
+    sort: 'price-asc',
+  });
+
+  const cleanDefaultUrl = buildUrlWithSearchState('/market/catalogue', {
+    etat: 'all',
+    segment: 'Tous',
+    q: '',
+    sort: 'featured',
+  });
+  assert.equal(cleanDefaultUrl, '/market/catalogue');
+
+  // Invalid params are safely ignored
+  assert.deepEqual(
+    parseUrlSearchState('?etat=invalid&segment=Unknown&tab=seller'),
+    { tab: 'seller' },
+  );
+});

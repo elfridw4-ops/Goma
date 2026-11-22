@@ -72,7 +72,7 @@ export function ScrollytellingSection() {
 
               <motion.div
                 style={{ y: stageY }}
-                className="flex-1 min-w-0 space-y-6 will-change-transform"
+                className="flex-1 min-w-0 space-y-6"
               >
                 <div className="flex items-center justify-between gap-4">
                   <div
@@ -143,7 +143,7 @@ export function ScrollytellingSection() {
                         </div>
                       ))}
                     </div>
-                    <p className="font-body text-sm text-[#44403C]">
+                    <p className="font-body text-sm text-[#44403C] max-w-[65ch]">
                       L’assistant IA intégré à la marketplace conseille selon
                       votre budget en FCFA et le stock disponible.
                     </p>
@@ -197,7 +197,7 @@ export function ScrollytellingSection() {
                     {chapter.title}
                   </h3>
 
-                  <p className="font-body text-base leading-[1.7] text-[#44403C]">
+                  <p className="font-body text-base leading-[1.7] text-[#44403C] max-w-[65ch]">
                     {chapter.summary}
                   </p>
                 </article>

@@ -80,7 +80,7 @@ export function MarketAccountView({
         <div className="relative overflow-hidden rounded-2xl border border-[#E7E2D9] bg-[#2B211B] text-[#FDFCFB] p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <ResilientImage
             src={AUTH_LOOKBOOK_IMAGE}
-            alt="Espace membre Goma"
+            decorative
             className="absolute inset-0 w-full h-full object-cover opacity-25"
           />
           <div className="relative z-10 flex items-start sm:items-center gap-4">
@@ -187,7 +187,7 @@ export function MarketAccountView({
             catalogue ou une fiche produit.
           </p>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5 contain-grid">
             {wishlistedProducts.map((item) => (
               <ProductCard
                 key={item.id}

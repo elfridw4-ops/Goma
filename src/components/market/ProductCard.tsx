@@ -67,14 +67,10 @@ export function ProductCard({
                 : `Ajouter ${product.name} aux favoris`
             }
             aria-pressed={isWishlisted}
-            style={{
-              WebkitBackdropFilter: 'blur(10px)',
-              backdropFilter: 'blur(10px)',
-            }}
-            className={`absolute top-2 right-2 w-8 h-8 rounded-lg border flex items-center justify-center transition-colors cursor-pointer ${
+            className={`absolute top-2 right-2 w-9 h-9 rounded-lg border flex items-center justify-center active:scale-[0.95] transition-[background-color,border-color,transform] cursor-pointer ${
               isWishlisted
-                ? 'bg-[#2B211B]/90 border-[#C08A2E] text-[#D4973B]'
-                : 'bg-[#FDFCFB]/80 border-[#E7E2D9] text-[#2B211B] hover:bg-[#FDFCFB]'
+                ? 'glass-surface-toast border-[#C08A2E] text-[#D4973B]'
+                : 'glass-surface-light border-[#E7E2D9] text-[#2B211B] hover:bg-[#FDFCFB]'
             }`}
           >
             <Heart

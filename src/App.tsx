@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { X } from 'lucide-react';
 import { INITIAL_PRODUCTS, INITIAL_SHOPS } from './data/catalog';
 import {
   authService,
@@ -18,9 +19,11 @@ import type {
 } from './types/marketplace';
 import {
   addToCart,
+  buildUrlWithSearchState,
   calculateCartTotals,
   createProductFromDraft,
   filterAndSortProducts,
+  parseUrlSearchState,
   removeFromCart,
   toggleWishlistItem,
   updateCartQuantity,
@@ -106,6 +109,11 @@ interface ToastState {
 }
 
 export default function App() {
+  const initialQueryState = useMemo(
+    () => parseUrlSearchState(window.location.search),
+    [],
+  );
+
   const [route, setRoute] = useState<AppRoute>(() =>
     parsePathToRoute(window.location.pathname),
   );
@@ -118,14 +126,23 @@ export default function App() {
     [customProducts],
   );
 
-  const [condition, setCondition] = useState<ProductCondition>('frip');
+  const [condition, setCondition] = useState<ProductCondition>(() =>
+    initialQueryState.etat === 'neuf' || initialQueryState.etat === 'frip'
+      ? initialQueryState.etat
+      : 'frip',
+  );
   const [catalogueConditionFilter, setCatalogueConditionFilter] = useState<
     ProductCondition | 'all'
-  >('all');
-  const [selectedSegment, setSelectedSegment] =
-    useState<MarketSegment>('Tous');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<SortOption>('featured');
+  >(() => initialQueryState.etat ?? 'all');
+  const [selectedSegment, setSelectedSegment] = useState<MarketSegment>(
+    () => initialQueryState.segment ?? 'Tous',
+  );
+  const [searchQuery, setSearchQuery] = useState(
+    () => initialQueryState.q ?? '',
+  );
+  const [sortBy, setSortBy] = useState<SortOption>(
+    () => initialQueryState.sort ?? 'featured',
+  );
 
   const [cart, setCart] = useState<CartItem[]>(() =>
     marketplaceRepository.getCart(),
@@ -150,14 +167,31 @@ export default function App() {
   const activeWishlist = session ? accountWishlist : guestWishlist;
 
   const [lastOrder, setLastOrder] = useState<OrderConfirmation | null>(null);
-  const [aiTab, setAiTab] = useState<'buyer' | 'seller'>('buyer');
+  const [aiTab, setAiTab] = useState<'buyer' | 'seller'>(
+    () => initialQueryState.tab ?? 'buyer',
+  );
   const [prefilledBuyerPrompt, setPrefilledBuyerPrompt] = useState('');
   const [toast, setToast] = useState<ToastState | null>(null);
+  const [toastPaused, setToastPaused] = useState(false);
   const toastTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     const onPopState = () => {
-      setRoute(parsePathToRoute(window.location.pathname));
+      const nextRoute = parsePathToRoute(window.location.pathname);
+      const qState = parseUrlSearchState(window.location.search);
+      setRoute(nextRoute);
+      if (nextRoute.view === 'market-catalogue') {
+        setCatalogueConditionFilter(qState.etat ?? 'all');
+        setSelectedSegment(qState.segment ?? 'Tous');
+        setSearchQuery(qState.q ?? '');
+        setSortBy(qState.sort ?? 'featured');
+      } else if (nextRoute.view === 'market-home') {
+        if (qState.etat === 'neuf' || qState.etat === 'frip') {
+          setCondition(qState.etat);
+        }
+      } else if (nextRoute.view === 'market-assistant' && qState.tab) {
+        setAiTab(qState.tab);
+      }
     };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
@@ -185,10 +219,112 @@ export default function App() {
     }
   }, [session, accountWishlist]);
 
+  // Synchronize filter/tab state in URL without polluting history stack
+  useEffect(() => {
+    if (route.view === 'market-catalogue') {
+      const basePath = routeToPath(route);
+      const nextUrl = buildUrlWithSearchState(basePath, {
+        etat: catalogueConditionFilter,
+        segment: selectedSegment,
+        q: searchQuery,
+        sort: sortBy,
+      });
+      if (window.location.pathname + window.location.search !== nextUrl) {
+        window.history.replaceState(window.history.state, '', nextUrl);
+      }
+    } else if (route.view === 'market-home') {
+      const nextUrl = buildUrlWithSearchState('/market', { etat: condition });
+      if (window.location.pathname + window.location.search !== nextUrl) {
+        window.history.replaceState(window.history.state, '', nextUrl);
+      }
+    } else if (route.view === 'market-assistant') {
+      const nextUrl = buildUrlWithSearchState('/market/assistant', { tab: aiTab });
+      if (window.location.pathname + window.location.search !== nextUrl) {
+        window.history.replaceState(window.history.state, '', nextUrl);
+      }
+    }
+  }, [
+    route,
+    condition,
+    catalogueConditionFilter,
+    selectedSegment,
+    searchQuery,
+    sortBy,
+    aiTab,
+  ]);
+
+  // Dynamic <title> reflecting the current view
+  useEffect(() => {
+    let nextTitle = 'Goma — Delano Collection';
+    switch (route.view) {
+      case 'vitrine':
+        nextTitle = 'Goma — Delano Collection · Vitrine éditoriale';
+        break;
+      case 'market-home':
+        nextTitle = `Marketplace Goma (${condition === 'frip' ? 'Friperie' : 'Neuf'}) · Delano Collection`;
+        break;
+      case 'market-catalogue':
+        nextTitle =
+          selectedSegment !== 'Tous'
+            ? `Catalogue ${selectedSegment} — Marketplace Goma`
+            : 'Catalogue complet — Marketplace Goma';
+        break;
+      case 'market-product': {
+        const prod = products.find((p) => p.id === route.productId);
+        nextTitle = prod ? `${prod.name} — Marketplace Goma` : 'Fiche produit — Goma';
+        break;
+      }
+      case 'market-cart':
+        nextTitle = 'Votre panier — Marketplace Goma';
+        break;
+      case 'market-login':
+        nextTitle = 'Connexion — Marketplace Goma';
+        break;
+      case 'market-account':
+        nextTitle = 'Mon compte & favoris — Marketplace Goma';
+        break;
+      case 'market-assistant':
+        nextTitle =
+          aiTab === 'seller'
+            ? 'Espace Vendeur & SEO — Marketplace Goma'
+            : 'Conseiller Acheteur IA — Marketplace Goma';
+        break;
+    }
+    document.title = nextTitle;
+  }, [route, condition, selectedSegment, aiTab, products]);
+
+  // Manage toast auto-dismiss timer cleanly with pause on hover/focus
+  useEffect(() => {
+    if (!toast || toastPaused) return;
+    const duration = toast.actionLabel ? 6500 : 4500;
+    toastTimerRef.current = window.setTimeout(() => setToast(null), duration);
+    return () => {
+      if (toastTimerRef.current) {
+        window.clearTimeout(toastTimerRef.current);
+      }
+    };
+  }, [toast, toastPaused]);
+
   const navigate = (nextRoute: AppRoute) => {
-    const targetPath = routeToPath(nextRoute);
-    if (window.location.pathname !== targetPath) {
-      window.history.pushState({}, '', targetPath);
+    const basePath = routeToPath(nextRoute);
+    let targetUrl = basePath;
+    if (nextRoute.view === 'market-catalogue') {
+      targetUrl = buildUrlWithSearchState(basePath, {
+        etat: catalogueConditionFilter,
+        segment: nextRoute.segment ?? selectedSegment,
+        q: searchQuery,
+        sort: sortBy,
+      });
+    } else if (nextRoute.view === 'market-assistant') {
+      targetUrl = buildUrlWithSearchState(basePath, {
+        tab: nextRoute.tab ?? aiTab,
+      });
+    } else if (nextRoute.view === 'market-home') {
+      targetUrl = buildUrlWithSearchState(basePath, { etat: condition });
+    }
+
+    if (window.location.pathname + window.location.search !== targetUrl) {
+      window.history.pushState({}, '', targetUrl);
     }
     if (nextRoute.view === 'market-cart' || nextRoute.view === 'market-login') {
       setToast(null);
@@ -201,8 +337,8 @@ export default function App() {
     if (toastTimerRef.current) {
       window.clearTimeout(toastTimerRef.current);
     }
+    setToastPaused(false);
     setToast(nextToast);
-    toastTimerRef.current = window.setTimeout(() => setToast(null), 3200);
   };
 
   const cartTotals = useMemo(() => calculateCartTotals(cart), [cart]);
@@ -352,15 +488,22 @@ export default function App() {
   // --- VITRINE (Pure Editorial Showcase, zero transactional controls) ---
   if (route.view === 'vitrine') {
     return (
-      <div className="min-h-screen bg-[#FDFCFB] text-[#201F1C] relative">
+      <div id="app-shell" className="min-h-screen bg-[#FDFCFB] text-[#201F1C] relative">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[400] focus:rounded-[10px] focus:bg-[#2B211B] focus:px-4 focus:py-2.5 focus:text-xs focus:font-display focus:font-semibold focus:text-[#FDFCFB] focus:shadow-layer-md"
+        >
+          Aller au contenu principal
+        </a>
+
         <div
           aria-hidden="true"
-          className="pointer-events-none fixed inset-0 z-40 grain-overlay"
+          className="pointer-events-none fixed inset-0 z-[1] grain-overlay"
         />
 
         <VitrineHeader onEnterMarketplace={handleEnterMarketplace} />
 
-        <main>
+        <main id="main-content" tabIndex={-1} className="outline-none">
           <HeroSection
             onEnterMarketplace={handleEnterMarketplace}
             onDiscoverVitrine={handleScrollToVitrine}
@@ -412,44 +555,52 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#FDFCFB] text-[#201F1C] relative">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-30 grain-overlay"
-      />
+      <div id="app-shell">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[400] focus:rounded-[10px] focus:bg-[#2B211B] focus:px-4 focus:py-2.5 focus:text-xs focus:font-display focus:font-semibold focus:text-[#FDFCFB] focus:shadow-layer-md"
+        >
+          Aller au contenu principal
+        </a>
 
-      <MarketHeader
-        condition={condition}
-        cartItemCount={cartTotals.itemCount}
-        wishlistCount={activeWishlist.length}
-        session={session}
-        activeView={route.view}
-        showInfoBanner={route.view === 'market-home'}
-        onChangeCondition={(next) => {
-          setCondition(next);
-          if (route.view === 'market-catalogue') {
-            setCatalogueConditionFilter(next);
-          } else if (route.view !== 'market-home') {
-            navigate({ view: 'market-home' });
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-0 z-[1] grain-overlay"
+        />
+
+        <MarketHeader
+          condition={condition}
+          cartItemCount={cartTotals.itemCount}
+          wishlistCount={activeWishlist.length}
+          session={session}
+          activeView={route.view}
+          showInfoBanner={route.view === 'market-home'}
+          onChangeCondition={(next) => {
+            setCondition(next);
+            if (route.view === 'market-catalogue') {
+              setCatalogueConditionFilter(next);
+            } else if (route.view !== 'market-home') {
+              navigate({ view: 'market-home' });
+            }
+          }}
+          onGoVitrine={() => navigate({ view: 'vitrine' })}
+          onGoMarketHome={() => navigate({ view: 'market-home' })}
+          onGoCatalogue={() => {
+            setCatalogueConditionFilter(condition);
+            navigate({ view: 'market-catalogue' });
+          }}
+          onGoAssistant={() => {
+            setAiTab('buyer');
+            navigate({ view: 'market-assistant', tab: 'buyer' });
+          }}
+          onGoCart={() => navigate({ view: 'market-cart' })}
+          onGoAccount={() =>
+            navigate(session ? { view: 'market-account' } : { view: 'market-login' })
           }
-        }}
-        onGoVitrine={() => navigate({ view: 'vitrine' })}
-        onGoMarketHome={() => navigate({ view: 'market-home' })}
-        onGoCatalogue={() => {
-          setCatalogueConditionFilter(condition);
-          navigate({ view: 'market-catalogue' });
-        }}
-        onGoAssistant={() => {
-          setAiTab('buyer');
-          navigate({ view: 'market-assistant', tab: 'buyer' });
-        }}
-        onGoCart={() => navigate({ view: 'market-cart' })}
-        onGoAccount={() =>
-          navigate(session ? { view: 'market-account' } : { view: 'market-login' })
-        }
-      />
+        />
 
-      <main>
-        {route.view === 'market-home' && (
+        <main id="main-content" tabIndex={-1} className="outline-none">
+          {route.view === 'market-home' && (
           <MarketHomeView
             products={products}
             condition={condition}
@@ -536,7 +687,7 @@ export default function App() {
             onAskAiAboutProduct={(product) => {
               setAiTab('buyer');
               setPrefilledBuyerPrompt(
-                `Comment porter et associer "${product.name}" (${product.material}) ?`,
+                `Comment porter et associer « ${product.name} » (${product.material}) ?`,
               );
               navigate({ view: 'market-assistant', tab: 'buyer' });
             }}
@@ -647,6 +798,7 @@ export default function App() {
           }
         />
       )}
+      </div>
 
       {/* Toast notification (cart addition, local favorite save, account sync) */}
       {toast && (
@@ -654,22 +806,30 @@ export default function App() {
           role="status"
           aria-live="polite"
           data-testid="market-toast"
-          style={{
-            WebkitBackdropFilter: 'blur(16px)',
-            backdropFilter: 'blur(16px)',
-          }}
-          className="fixed bottom-20 md:bottom-6 right-4 z-50 max-w-sm rounded-xl bg-[#2B211B]/92 text-[#FDFCFB] px-4 py-3 text-xs sm:text-sm font-display font-semibold shadow-layer-lg flex items-center gap-3 border border-[#F2E9DA]/15"
+          onMouseEnter={() => setToastPaused(true)}
+          onMouseLeave={() => setToastPaused(false)}
+          onFocus={() => setToastPaused(true)}
+          onBlur={() => setToastPaused(false)}
+          className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] md:bottom-6 right-4 z-[400] max-w-sm rounded-xl glass-surface-toast text-[#FDFCFB] px-4 py-3 text-xs sm:text-sm font-display font-semibold shadow-layer-lg flex items-center gap-3 border border-[#F2E9DA]/15"
         >
           <span>{toast.message}</span>
           {toast.actionLabel && toast.onAction && (
             <button
               type="button"
               onClick={toast.onAction}
-              className="text-[#D4973B] underline underline-offset-2 shrink-0 cursor-pointer"
+              className="text-[#D4973B] underline underline-offset-2 shrink-0 cursor-pointer active:scale-[0.97] transition-transform"
             >
               {toast.actionLabel}
             </button>
           )}
+          <button
+            type="button"
+            onClick={() => setToast(null)}
+            aria-label="Fermer la notification"
+            className="ml-1 -mr-1 w-6 h-6 rounded-md inline-flex items-center justify-center text-[#F2E9DA]/75 hover:text-[#FDFCFB] hover:bg-[#FDFCFB]/10 shrink-0 cursor-pointer transition-colors"
+          >
+            <X className="w-3.5 h-3.5" aria-hidden="true" />
+          </button>
         </div>
       )}
     </div>

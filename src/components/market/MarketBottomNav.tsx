@@ -57,11 +57,7 @@ export function MarketBottomNav({
   return (
     <nav
       aria-label="Navigation mobile marketplace"
-      style={{
-        WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-        backdropFilter: 'blur(20px) saturate(160%)',
-      }}
-      className="md:hidden fixed bottom-0 inset-x-0 z-40 h-14 bg-[#F2E9DA]/76 border-t border-[#2B211B]/12 px-2 grid grid-cols-4 items-center"
+      className="md:hidden fixed bottom-0 inset-x-0 z-[100] min-h-[3.5rem] pb-[env(safe-area-inset-bottom)] glass-surface-light border-t border-[#2B211B]/12 px-2 grid grid-cols-4 items-center"
     >
       {items.map((item) => {
         const Icon = item.icon;
@@ -71,7 +67,7 @@ export function MarketBottomNav({
             type="button"
             onClick={item.onClick}
             aria-current={item.active ? 'page' : undefined}
-            className={`relative flex flex-col items-center justify-center gap-0.5 h-full text-[11px] font-display transition-colors cursor-pointer ${
+            className={`relative flex flex-col items-center justify-center gap-0.5 py-1.5 min-h-[44px] text-[11px] font-display active:scale-[0.97] transition-[color,transform] cursor-pointer ${
               item.active ? 'text-[#2B211B] font-bold' : 'text-[#7A5B45]'
             }`}
           >

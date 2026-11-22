@@ -1,4 +1,10 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type KeyboardEvent,
+} from 'react';
 import { CheckCircle2, Loader2, Sparkles } from 'lucide-react';
 import type {
   AiBuyerResponse,
@@ -12,6 +18,7 @@ import {
   formatPriceFcfa,
   validateSellerDraft,
 } from '../../utils/marketplaceLogic';
+import { focusFirstInvalidField } from '../../utils/useModalAccessibility';
 import { ResilientImage } from '../ResilientImage';
 
 interface MarketAiViewProps {
@@ -73,6 +80,8 @@ export function MarketAiView({
   const [sellerAiPreview, setSellerAiPreview] =
     useState<AiSellerResponse | null>(null);
   const [publishedProduct, setPublishedProduct] = useState<Product | null>(null);
+  const buyerAbortRef = useRef<AbortController | null>(null);
+  const sellerAbortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     if (prefilledBuyerPrompt) {
@@ -80,20 +89,36 @@ export function MarketAiView({
     }
   }, [prefilledBuyerPrompt]);
 
+  useEffect(() => {
+    return () => {
+      buyerAbortRef.current?.abort();
+      sellerAbortRef.current?.abort();
+    };
+  }, []);
+
   const handleBuyerSubmit = async (e: FormEvent, overrideQuery?: string) => {
     e.preventDefault();
     const promptToSend = (overrideQuery ?? buyerQuery).trim();
     if (promptToSend.length < 2) {
       setBuyerError('Décrivez votre besoin de tenue, taille ou budget en FCFA.');
+      focusFirstInvalidField([
+        { id: 'market-buyer-ai-input', hasError: true },
+      ]);
       return;
     }
 
+    buyerAbortRef.current?.abort();
+    const controller = new AbortController();
+    buyerAbortRef.current = controller;
+
+    const startedAt = Date.now();
     setBuyerError(null);
     setBuyerLoading(true);
     try {
       const response = await fetch('/api/assistant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           mode: 'buyer',
           query: promptToSend,
@@ -101,6 +126,12 @@ export function MarketAiView({
         }),
       });
       const data = await response.json();
+      const elapsed = Date.now() - startedAt;
+      if (elapsed < 320) {
+        await new Promise((r) => window.setTimeout(r, 320 - elapsed));
+      }
+      if (controller.signal.aborted) return;
+
       if (!response.ok) {
         setBuyerError(
           data.error || 'Impossible de contacter le conseiller IA pour le moment.',
@@ -108,10 +139,13 @@ export function MarketAiView({
         return;
       }
       setBuyerResult(data as AiBuyerResponse);
-    } catch {
+    } catch (err) {
+      if ((err as Error).name === 'AbortError') return;
       setBuyerError('Erreur réseau lors de la connexion au service assistant.');
     } finally {
-      setBuyerLoading(false);
+      if (buyerAbortRef.current === controller) {
+        setBuyerLoading(false);
+      }
     }
   };
 
@@ -120,21 +154,34 @@ export function MarketAiView({
       setSellerAiError(
         'Indiquez d’abord le nom de l’article pour générer sa fiche SEO & GEO.',
       );
+      focusFirstInvalidField([{ id: 'seller-name', hasError: true }]);
       return;
     }
 
+    sellerAbortRef.current?.abort();
+    const controller = new AbortController();
+    sellerAbortRef.current = controller;
+
+    const startedAt = Date.now();
     setSellerAiError(null);
     setSellerAiLoading(true);
     try {
       const response = await fetch('/api/assistant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           mode: 'seller',
           sellerInput: draft,
         }),
       });
       const data = await response.json();
+      const elapsed = Date.now() - startedAt;
+      if (elapsed < 320) {
+        await new Promise((r) => window.setTimeout(r, 320 - elapsed));
+      }
+      if (controller.signal.aborted) return;
+
       if (!response.ok) {
         setSellerAiError(
           data.error || 'Impossible de générer la fiche SEO & GEO par IA.',
@@ -152,18 +199,31 @@ export function MarketAiView({
             ? String(aiData.suggestedPriceFcfa)
             : prev.priceFcfa,
       }));
-    } catch {
+    } catch (err) {
+      if ((err as Error).name === 'AbortError') return;
       setSellerAiError('Erreur réseau lors de la génération SEO & GEO.');
     } finally {
-      setSellerAiLoading(false);
+      if (sellerAbortRef.current === controller) {
+        setSellerAiLoading(false);
+      }
     }
   };
 
-  const handlePublishSubmit = (e: FormEvent) => {
-    e.preventDefault();
+  const submitSellerDraft = () => {
     const validationErrors = validateSellerDraft(draft);
     if (Object.keys(validationErrors).length > 0) {
       setDraftErrors(validationErrors);
+      focusFirstInvalidField([
+        { id: 'seller-name', hasError: Boolean(validationErrors.name) },
+        { id: 'seller-price', hasError: Boolean(validationErrors.priceFcfa) },
+        { id: 'seller-material', hasError: Boolean(validationErrors.material) },
+        { id: 'seller-city', hasError: Boolean(validationErrors.geoCity) },
+        { id: 'seller-sizes', hasError: Boolean(validationErrors.sizesInput) },
+        {
+          id: 'seller-description',
+          hasError: Boolean(validationErrors.description),
+        },
+      ]);
       return;
     }
 
@@ -172,6 +232,18 @@ export function MarketAiView({
     setPublishedProduct(created);
     setDraft(INITIAL_SELLER_DRAFT);
     setSellerAiPreview(null);
+  };
+
+  const handlePublishSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    submitSellerDraft();
+  };
+
+  const handleDescriptionKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      submitSellerDraft();
+    }
   };
 
   const recommendedProducts = buyerResult
@@ -254,20 +326,23 @@ export function MarketAiView({
                 type="text"
                 value={buyerQuery}
                 onChange={(e) => setBuyerQuery(e.target.value)}
-                placeholder="Ex. : Une tenue légère pour Cotonou sous 20 000 F..."
-                className="flex-1 rounded-[10px] border border-[#E7E2D9] bg-white px-4 py-3 text-sm text-[#201F1C] placeholder:text-[#78716C] focus:border-[#8A5A36] focus:outline-none"
+                aria-invalid={Boolean(buyerError)}
+                aria-describedby={buyerError ? 'buyer-ai-error' : undefined}
+                placeholder="Ex. : Une tenue légère pour Cotonou sous 20 000 F…"
+                className="flex-1 rounded-[10px] border border-[#E7E2D9] bg-white px-4 py-3 text-base sm:text-sm text-[#201F1C] placeholder:text-[#78716C] focus:border-[#8A5A36]"
               />
               <button
                 type="submit"
                 disabled={buyerLoading}
-                className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-[#8A5A36] px-6 py-3 text-sm font-display font-semibold text-[#FDFCFB] whitespace-nowrap shrink-0 hover:bg-[#74492A] disabled:opacity-60 cursor-pointer"
+                aria-busy={buyerLoading}
+                className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-[#8A5A36] px-6 py-3 text-sm font-display font-semibold text-[#FDFCFB] whitespace-nowrap shrink-0 hover:bg-[#74492A] active:scale-[0.98] disabled:opacity-60 transition-[background-color,transform] duration-150 cursor-pointer"
               >
                 {buyerLoading && (
                   <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                 )}
                 <span>
                   {buyerLoading
-                    ? 'Analyse en cours...'
+                    ? 'Analyse en cours…'
                     : 'Obtenir une recommandation'}
                 </span>
               </button>
@@ -292,6 +367,7 @@ export function MarketAiView({
 
           {buyerError && (
             <div
+              id="buyer-ai-error"
               role="alert"
               className="rounded-[10px] border border-[#991B1B]/30 bg-[#FEF2F2] px-4 py-3 text-sm text-[#991B1B]"
             >
@@ -305,10 +381,10 @@ export function MarketAiView({
                 <p className="font-display text-sm font-bold text-[#2B211B]">
                   Recommandation Marketplace Goma
                 </p>
-                <p className="font-body text-base leading-relaxed text-[#201F1C]">
+                <p className="font-body text-base leading-relaxed text-[#201F1C] max-w-[65ch]">
                   {buyerResult.advice}
                 </p>
-                <p className="font-body text-sm text-[#7A5B45]">
+                <p className="font-body text-sm text-[#7A5B45] max-w-[65ch]">
                   {buyerResult.stylingNotes}
                 </p>
               </div>
@@ -361,11 +437,19 @@ export function MarketAiView({
                 type="text"
                 value={draft.name}
                 onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+                aria-invalid={Boolean(draftErrors.name)}
+                aria-describedby={draftErrors.name ? 'seller-name-error' : undefined}
                 placeholder="Ex. : Robe Lin Naturel ou Jean Vintage"
-                className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3.5 py-2.5 text-sm text-[#201F1C]"
+                className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3.5 py-2.5 text-base sm:text-sm text-[#201F1C]"
               />
               {draftErrors.name && (
-                <p className="mt-1 text-xs text-[#991B1B]">{draftErrors.name}</p>
+                <p
+                  id="seller-name-error"
+                  aria-live="polite"
+                  className="mt-1 text-xs text-[#991B1B]"
+                >
+                  {draftErrors.name}
+                </p>
               )}
             </div>
 
@@ -387,7 +471,7 @@ export function MarketAiView({
                     isUniquePiece: next === 'frip',
                   });
                 }}
-                className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3.5 py-2.5 text-sm text-[#201F1C]"
+                className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3.5 py-2.5 text-base sm:text-sm text-[#201F1C]"
               >
                 <option value="frip">Friperie (Pièce unique)</option>
                 <option value="neuf">Neuf</option>
@@ -412,7 +496,7 @@ export function MarketAiView({
                     segment: e.target.value as Exclude<MarketSegment, 'Tous'>,
                   })
                 }
-                className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3.5 py-2.5 text-sm text-[#201F1C]"
+                className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3.5 py-2.5 text-base sm:text-sm text-[#201F1C]"
               >
                 {SELLER_SEGMENTS.map((seg) => (
                   <option key={seg} value={seg}>
@@ -432,16 +516,23 @@ export function MarketAiView({
               <input
                 id="seller-price"
                 type="number"
+                inputMode="numeric"
                 min="100"
                 value={draft.priceFcfa}
                 onChange={(e) =>
                   setDraft({ ...draft, priceFcfa: e.target.value })
                 }
+                aria-invalid={Boolean(draftErrors.priceFcfa)}
+                aria-describedby={draftErrors.priceFcfa ? 'seller-price-error' : undefined}
                 placeholder="2500"
-                className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3.5 py-2.5 text-sm font-mono-tabular text-[#201F1C]"
+                className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3.5 py-2.5 text-base sm:text-sm font-mono-tabular text-[#201F1C]"
               />
               {draftErrors.priceFcfa && (
-                <p className="mt-1 text-xs text-[#991B1B]">
+                <p
+                  id="seller-price-error"
+                  aria-live="polite"
+                  className="mt-1 text-xs text-[#991B1B]"
+                >
                   {draftErrors.priceFcfa}
                 </p>
               )}
@@ -461,11 +552,17 @@ export function MarketAiView({
                 onChange={(e) =>
                   setDraft({ ...draft, material: e.target.value })
                 }
-                placeholder="Coton, Denim, Cuir..."
-                className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3.5 py-2.5 text-sm text-[#201F1C]"
+                aria-invalid={Boolean(draftErrors.material)}
+                aria-describedby={draftErrors.material ? 'seller-material-error' : undefined}
+                placeholder="Coton, Denim, Cuir…"
+                className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3.5 py-2.5 text-base sm:text-sm text-[#201F1C]"
               />
               {draftErrors.material && (
-                <p className="mt-1 text-xs text-[#991B1B]">
+                <p
+                  id="seller-material-error"
+                  aria-live="polite"
+                  className="mt-1 text-xs text-[#991B1B]"
+                >
                   {draftErrors.material}
                 </p>
               )}
@@ -485,11 +582,17 @@ export function MarketAiView({
                 onChange={(e) =>
                   setDraft({ ...draft, geoCity: e.target.value })
                 }
+                aria-invalid={Boolean(draftErrors.geoCity)}
+                aria-describedby={draftErrors.geoCity ? 'seller-city-error' : undefined}
                 placeholder="Cotonou"
-                className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3.5 py-2.5 text-sm text-[#201F1C]"
+                className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3.5 py-2.5 text-base sm:text-sm text-[#201F1C]"
               />
               {draftErrors.geoCity && (
-                <p className="mt-1 text-xs text-[#991B1B]">
+                <p
+                  id="seller-city-error"
+                  aria-live="polite"
+                  className="mt-1 text-xs text-[#991B1B]"
+                >
                   {draftErrors.geoCity}
                 </p>
               )}
@@ -510,11 +613,17 @@ export function MarketAiView({
               onChange={(e) =>
                 setDraft({ ...draft, sizesInput: e.target.value })
               }
+              aria-invalid={Boolean(draftErrors.sizesInput)}
+              aria-describedby={draftErrors.sizesInput ? 'seller-sizes-error' : undefined}
               placeholder="M ou S, M, L"
-              className="w-full sm:w-1/2 rounded-[10px] border border-[#E7E2D9] bg-white px-3.5 py-2.5 text-sm font-mono-tabular text-[#201F1C]"
+              className="w-full sm:w-1/2 rounded-[10px] border border-[#E7E2D9] bg-white px-3.5 py-2.5 text-base sm:text-sm font-mono-tabular text-[#201F1C]"
             />
             {draftErrors.sizesInput && (
-              <p className="mt-1 text-xs text-[#991B1B]">
+              <p
+                id="seller-sizes-error"
+                aria-live="polite"
+                className="mt-1 text-xs text-[#991B1B]"
+              >
                 {draftErrors.sizesInput}
               </p>
             )}
@@ -532,7 +641,8 @@ export function MarketAiView({
                 type="button"
                 onClick={handleGenerateSeo}
                 disabled={sellerAiLoading}
-                className="inline-flex items-center gap-1.5 text-xs font-display font-semibold text-[#8A5A36] hover:text-[#2B211B] disabled:opacity-60 cursor-pointer"
+                aria-busy={sellerAiLoading}
+                className="inline-flex items-center gap-1.5 text-xs font-display font-semibold text-[#8A5A36] hover:text-[#2B211B] disabled:opacity-60 active:scale-[0.97] transition-transform cursor-pointer"
               >
                 {sellerAiLoading ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />
@@ -541,7 +651,7 @@ export function MarketAiView({
                 )}
                 <span>
                   {sellerAiLoading
-                    ? 'Génération en cours...'
+                    ? 'Génération en cours…'
                     : 'Rédiger avec l’IA SEO & GEO'}
                 </span>
               </button>
@@ -553,11 +663,26 @@ export function MarketAiView({
               onChange={(e) =>
                 setDraft({ ...draft, description: e.target.value })
               }
-              placeholder="Décrivez la coupe, l’état et les finitions..."
-              className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3.5 py-2.5 text-sm text-[#201F1C]"
+              onKeyDown={handleDescriptionKeyDown}
+              aria-invalid={Boolean(draftErrors.description)}
+              aria-describedby={
+                draftErrors.description ? 'seller-description-error' : 'seller-description-hint'
+              }
+              placeholder="Décrivez la coupe, l’état et les finitions…"
+              className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3.5 py-2.5 text-base sm:text-sm text-[#201F1C]"
             />
+            <p
+              id="seller-description-hint"
+              className="mt-1 text-[11px] font-mono-tabular text-[#78716C]"
+            >
+              Ctrl / ⌘ + Entrée pour publier
+            </p>
             {draftErrors.description && (
-              <p className="mt-1 text-xs text-[#991B1B]">
+              <p
+                id="seller-description-error"
+                aria-live="polite"
+                className="mt-1 text-xs text-[#991B1B]"
+              >
                 {draftErrors.description}
               </p>
             )}
@@ -582,7 +707,7 @@ export function MarketAiView({
           <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
             <button
               type="submit"
-              className="rounded-[10px] bg-[#C08A2E] px-6 py-3 text-sm font-display font-bold text-[#201F1C] hover:bg-[#D4973B] transition-colors cursor-pointer"
+              className="rounded-[10px] bg-[#C08A2E] px-6 py-3 text-sm font-display font-bold text-[#201F1C] hover:bg-[#D4973B] active:scale-[0.98] transition-[background-color,transform] duration-150 cursor-pointer"
             >
               Publier sur la marketplace
             </button>

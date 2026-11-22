@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { AUTH_LOOKBOOK_IMAGE } from '../../data/catalog';
 import { validateLoginForm } from '../../utils/marketplaceLogic';
+import { focusFirstInvalidField } from '../../utils/useModalAccessibility';
 import { GomaMarkIcon, GoogleLogoIcon } from '../icons/BrandIcons';
 import { ResilientImage } from '../ResilientImage';
 
@@ -54,6 +55,11 @@ export function MarketLoginView({
     });
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      focusFirstInvalidField([
+        { id: 'login-fullname', hasError: Boolean(validationErrors.fullName) },
+        { id: 'login-phone', hasError: Boolean(validationErrors.phone) },
+        { id: 'login-password', hasError: Boolean(validationErrors.password) },
+      ]);
       return;
     }
     setErrors({});
@@ -65,12 +71,13 @@ export function MarketLoginView({
   };
 
   return (
-    <div className="mx-auto max-w-[1120px] px-4 sm:px-6 py-6 sm:py-10 pb-24 md:pb-14">
+    <div className="mx-auto max-w-[1120px] px-4 sm:px-6 py-6 sm:py-10 pb-28 md:pb-14">
       <div className="grid grid-cols-1 lg:grid-cols-12 rounded-3xl overflow-hidden border border-[#E7E2D9] bg-white shadow-layer-md items-stretch">
         {/* Left Editorial Lookbook Panel */}
         <div className="lg:col-span-5 relative min-h-[240px] sm:min-h-[300px] lg:min-h-[620px] bg-[#2B211B] overflow-hidden flex flex-col justify-between p-6 sm:p-8 text-[#FDFCFB]">
           <ResilientImage
             src={AUTH_LOOKBOOK_IMAGE}
+            priority
             alt="Atelier Delano Collection à Cotonou — sélection Argile et Moutarde"
             className="absolute inset-0 w-full h-full object-cover object-center"
           />
@@ -81,7 +88,10 @@ export function MarketLoginView({
 
           <div className="relative z-10 flex items-center gap-2.5">
             <GomaMarkIcon className="w-7 h-7 shrink-0" />
-            <span className="font-display text-lg font-bold tracking-tight text-[#FDFCFB]">
+            <span
+              translate="no"
+              className="font-display text-lg font-bold tracking-tight text-[#FDFCFB]"
+            >
               Goma · Delano Collection
             </span>
           </div>
@@ -196,7 +206,7 @@ export function MarketLoginView({
             <button
               type="button"
               onClick={onLoginGoogle}
-              className="w-full rounded-xl border border-[#E7E2D9] bg-white px-4 py-3 text-sm font-display font-semibold text-[#201F1C] hover:border-[#8A5A36] hover:bg-[#F5F3EF] transition-colors flex items-center justify-center gap-3 shadow-layer-sm cursor-pointer"
+              className="w-full rounded-xl border border-[#E7E2D9] bg-white px-4 py-3 text-sm font-display font-semibold text-[#201F1C] hover:border-[#8A5A36] hover:bg-[#F5F3EF] active:scale-[0.98] transition-[background-color,border-color,transform] duration-150 flex items-center justify-center gap-3 shadow-layer-sm cursor-pointer"
             >
               <GoogleLogoIcon className="w-[18px] h-[18px] shrink-0" />
               <span>Continuer avec Google</span>
@@ -226,15 +236,25 @@ export function MarketLoginView({
                     />
                     <input
                       id="login-fullname"
+                      name="name"
                       type="text"
+                      autoComplete="name"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
+                      aria-invalid={Boolean(errors.fullName)}
+                      aria-describedby={errors.fullName ? 'login-fullname-error' : undefined}
                       placeholder="Ex. : Amina Tossou"
-                      className="w-full rounded-xl border border-[#E7E2D9] bg-white pl-10 pr-3.5 py-3 text-sm text-[#201F1C] placeholder:text-[#78716C] focus:border-[#8A5A36] focus:outline-none"
+                      className="w-full rounded-xl border border-[#E7E2D9] bg-white pl-10 pr-3.5 py-3 text-base sm:text-sm text-[#201F1C] placeholder:text-[#78716C] focus:border-[#8A5A36]"
                     />
                   </div>
                   {errors.fullName && (
-                    <p className="mt-1 text-xs text-[#991B1B]">{errors.fullName}</p>
+                    <p
+                      id="login-fullname-error"
+                      aria-live="polite"
+                      className="mt-1 text-xs text-[#991B1B]"
+                    >
+                      {errors.fullName}
+                    </p>
                   )}
                 </div>
               )}
@@ -253,15 +273,27 @@ export function MarketLoginView({
                   />
                   <input
                     id="login-phone"
+                    name="tel"
                     type="tel"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    spellCheck={false}
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
+                    aria-invalid={Boolean(errors.phone)}
+                    aria-describedby={errors.phone ? 'login-phone-error' : undefined}
                     placeholder="+229 97 00 00 00"
-                    className="w-full rounded-xl border border-[#E7E2D9] bg-white pl-10 pr-3.5 py-3 text-sm font-mono-tabular text-[#201F1C] placeholder:text-[#78716C] focus:border-[#8A5A36] focus:outline-none"
+                    className="w-full rounded-xl border border-[#E7E2D9] bg-white pl-10 pr-3.5 py-3 text-base sm:text-sm font-mono-tabular text-[#201F1C] placeholder:text-[#78716C] focus:border-[#8A5A36]"
                   />
                 </div>
                 {errors.phone && (
-                  <p className="mt-1 text-xs text-[#991B1B]">{errors.phone}</p>
+                  <p
+                    id="login-phone-error"
+                    aria-live="polite"
+                    className="mt-1 text-xs text-[#991B1B]"
+                  >
+                    {errors.phone}
+                  </p>
                 )}
               </div>
 
@@ -279,11 +311,16 @@ export function MarketLoginView({
                   />
                   <input
                     id="login-password"
+                    name="password"
                     type={showPassword ? 'text' : 'password'}
+                    autoComplete={isRegister ? 'new-password' : 'current-password'}
+                    spellCheck={false}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    aria-invalid={Boolean(errors.password)}
+                    aria-describedby={errors.password ? 'login-password-error' : undefined}
                     placeholder="Minimum 6 caractères"
-                    className="w-full rounded-xl border border-[#E7E2D9] bg-white pl-10 pr-11 py-3 text-sm text-[#201F1C] placeholder:text-[#78716C] focus:border-[#8A5A36] focus:outline-none"
+                    className="w-full rounded-xl border border-[#E7E2D9] bg-white pl-10 pr-12 py-3 text-base sm:text-sm text-[#201F1C] placeholder:text-[#78716C] focus:border-[#8A5A36]"
                   />
                   <button
                     type="button"
@@ -293,7 +330,7 @@ export function MarketLoginView({
                         ? 'Masquer le mot de passe'
                         : 'Afficher le mot de passe'
                     }
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-[#78716C] hover:text-[#201F1C] cursor-pointer"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-lg text-[#78716C] hover:text-[#201F1C] cursor-pointer"
                   >
                     {showPassword ? (
                       <EyeOff className="w-4 h-4" aria-hidden="true" />
@@ -303,17 +340,23 @@ export function MarketLoginView({
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="mt-1 text-xs text-[#991B1B]">{errors.password}</p>
+                  <p
+                    id="login-password-error"
+                    aria-live="polite"
+                    className="mt-1 text-xs text-[#991B1B]"
+                  >
+                    {errors.password}
+                  </p>
                 )}
               </div>
 
               <div className="flex items-center justify-between gap-2 text-xs">
-                <label className="inline-flex items-center gap-2 text-[#44403C] cursor-pointer">
+                <label className="inline-flex items-center gap-2.5 py-2 text-[#44403C] cursor-pointer">
                   <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 accent-[#8A5A36] rounded"
+                    className="w-4 h-4 accent-[#8A5A36] rounded cursor-pointer"
                   />
                   <span>Se souvenir de moi</span>
                 </label>
@@ -321,7 +364,7 @@ export function MarketLoginView({
                 <button
                   type="button"
                   onClick={() => setForgotNotice(true)}
-                  className="font-display font-semibold text-[#8A5A36] hover:text-[#2B211B] cursor-pointer"
+                  className="py-2 font-display font-semibold text-[#8A5A36] hover:text-[#2B211B] cursor-pointer"
                 >
                   Mot de passe oublié
                 </button>
@@ -337,7 +380,7 @@ export function MarketLoginView({
 
               <button
                 type="submit"
-                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#C08A2E] px-5 py-3.5 text-sm font-display font-bold text-[#201F1C] hover:bg-[#D4973B] transition-colors cursor-pointer"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#C08A2E] px-5 py-3.5 text-sm font-display font-bold text-[#201F1C] hover:bg-[#D4973B] active:scale-[0.98] transition-[background-color,transform] duration-150 cursor-pointer"
               >
                 <span>{isRegister ? 'Créer mon compte' : 'Se connecter'}</span>
                 <ArrowRight className="w-4 h-4" aria-hidden="true" />

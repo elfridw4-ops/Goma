@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from 'react';
+import { useCallback, useRef, useState, type FormEvent } from 'react';
+import { createPortal } from 'react-dom';
 import {
   CheckCircle2,
   Minus,
@@ -21,6 +22,10 @@ import {
   formatPriceFcfa,
   validateCheckoutForm,
 } from '../../utils/marketplaceLogic';
+import {
+  focusFirstInvalidField,
+  useModalAccessibility,
+} from '../../utils/useModalAccessibility';
 import { PaymentMethodIcon } from '../icons/BrandIcons';
 import { ResilientImage } from '../ResilientImage';
 
@@ -56,6 +61,13 @@ export function MarketCartView({
 }: MarketCartViewProps) {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const authCloseBtnRef = useRef<HTMLButtonElement>(null);
+
+  const closeAuthModal = useCallback(() => {
+    setAuthModalOpen(false);
+  }, []);
+
+  useModalAccessibility(authModalOpen, closeAuthModal, authCloseBtnRef);
 
   const [form, setForm] = useState<CheckoutFormValues>({
     fullName: session?.fullName || '',
@@ -88,6 +100,12 @@ export function MarketCartView({
     const validationErrors = validateCheckoutForm(form);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      focusFirstInvalidField([
+        { id: 'co-name', hasError: Boolean(validationErrors.fullName) },
+        { id: 'co-phone', hasError: Boolean(validationErrors.phone) },
+        { id: 'co-city', hasError: Boolean(validationErrors.city) },
+        { id: 'co-address', hasError: Boolean(validationErrors.address) },
+      ]);
       return;
     }
     setErrors({});
@@ -96,7 +114,7 @@ export function MarketCartView({
   };
 
   return (
-    <div className="mx-auto max-w-[960px] px-4 sm:px-6 py-6 sm:py-10 pb-24 md:pb-14">
+    <div className="mx-auto max-w-[960px] px-4 sm:px-6 py-6 sm:py-10 pb-28 md:pb-14">
       <div className="mb-6">
         <p className="font-mono-tabular text-xs font-semibold uppercase tracking-wide text-[#C08A2E] mb-1">
           Panier · {totals.itemCount}{' '}
@@ -240,18 +258,18 @@ export function MarketCartView({
                         Pièce unique · 1
                       </span>
                     ) : (
-                      <div className="inline-flex items-center gap-2 rounded-lg border border-[#E7E2D9] bg-[#F5F3EF] px-1.5 py-1">
+                      <div className="inline-flex items-center gap-1.5 rounded-lg border border-[#E7E2D9] bg-[#F5F3EF] px-1.5 py-1">
                         <button
                           type="button"
                           onClick={() =>
                             onUpdateQuantity(item.productId, item.selectedSize, -1)
                           }
                           aria-label={`Diminuer la quantité de ${item.name}`}
-                          className="w-6 h-6 rounded flex items-center justify-center hover:bg-white cursor-pointer"
+                          className="w-8 h-8 rounded flex items-center justify-center hover:bg-white active:scale-[0.95] transition-transform cursor-pointer"
                         >
                           <Minus className="w-3.5 h-3.5" aria-hidden="true" />
                         </button>
-                        <span className="font-mono-tabular text-xs font-semibold px-1">
+                        <span className="font-mono-tabular text-xs font-semibold px-1.5">
                           {item.quantity}
                         </span>
                         <button
@@ -261,7 +279,7 @@ export function MarketCartView({
                           }
                           disabled={item.quantity >= item.maxStock}
                           aria-label={`Augmenter la quantité de ${item.name}`}
-                          className="w-6 h-6 rounded flex items-center justify-center hover:bg-white disabled:opacity-40 cursor-pointer"
+                          className="w-8 h-8 rounded flex items-center justify-center hover:bg-white disabled:opacity-40 active:scale-[0.95] transition-transform cursor-pointer"
                         >
                           <Plus className="w-3.5 h-3.5" aria-hidden="true" />
                         </button>
@@ -325,7 +343,7 @@ export function MarketCartView({
                   <button
                     type="button"
                     onClick={handleCheckoutTrigger}
-                    className="w-full rounded-[10px] bg-[#C08A2E] px-5 py-3.5 text-sm font-display font-bold text-[#201F1C] hover:bg-[#D4973B] transition-colors cursor-pointer"
+                    className="w-full rounded-[10px] bg-[#C08A2E] px-5 py-3.5 text-sm font-display font-bold text-[#201F1C] hover:bg-[#D4973B] active:scale-[0.98] transition-[background-color,transform] duration-150 cursor-pointer"
                   >
                     Passer la commande
                   </button>
@@ -352,15 +370,23 @@ export function MarketCartView({
                     </label>
                     <input
                       id="co-name"
+                      name="name"
                       type="text"
+                      autoComplete="name"
                       value={form.fullName}
                       onChange={(e) =>
                         setForm({ ...form, fullName: e.target.value })
                       }
-                      className="w-full rounded-[10px] border border-[#E7E2D9] px-3 py-2 text-sm text-[#201F1C]"
+                      aria-invalid={Boolean(errors.fullName)}
+                      aria-describedby={errors.fullName ? 'co-name-error' : undefined}
+                      className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3 py-2 text-base sm:text-sm text-[#201F1C]"
                     />
                     {errors.fullName && (
-                      <p className="mt-1 text-xs text-[#991B1B]">
+                      <p
+                        id="co-name-error"
+                        aria-live="polite"
+                        className="mt-1 text-xs text-[#991B1B]"
+                      >
                         {errors.fullName}
                       </p>
                     )}
@@ -375,16 +401,26 @@ export function MarketCartView({
                     </label>
                     <input
                       id="co-phone"
+                      name="tel"
                       type="tel"
+                      inputMode="tel"
+                      autoComplete="tel"
+                      spellCheck={false}
                       value={form.phone}
                       onChange={(e) =>
                         setForm({ ...form, phone: e.target.value })
                       }
+                      aria-invalid={Boolean(errors.phone)}
+                      aria-describedby={errors.phone ? 'co-phone-error' : undefined}
                       placeholder="+229 97 00 00 00"
-                      className="w-full rounded-[10px] border border-[#E7E2D9] px-3 py-2 text-sm text-[#201F1C]"
+                      className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3 py-2 text-base sm:text-sm font-mono-tabular text-[#201F1C]"
                     />
                     {errors.phone && (
-                      <p className="mt-1 text-xs text-[#991B1B]">
+                      <p
+                        id="co-phone-error"
+                        aria-live="polite"
+                        className="mt-1 text-xs text-[#991B1B]"
+                      >
                         {errors.phone}
                       </p>
                     )}
@@ -403,7 +439,9 @@ export function MarketCartView({
                       onChange={(e) =>
                         setForm({ ...form, city: e.target.value })
                       }
-                      className="w-full rounded-[10px] border border-[#E7E2D9] px-3 py-2 text-sm text-[#201F1C]"
+                      aria-invalid={Boolean(errors.city)}
+                      aria-describedby={errors.city ? 'co-city-error' : undefined}
+                      className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3 py-2 text-base sm:text-sm text-[#201F1C]"
                     >
                       {BENIN_CITIES.filter((c) => c !== 'Autre ville').map(
                         (city) => (
@@ -414,7 +452,11 @@ export function MarketCartView({
                       )}
                     </select>
                     {errors.city && (
-                      <p className="mt-1 text-xs text-[#991B1B]">
+                      <p
+                        id="co-city-error"
+                        aria-live="polite"
+                        className="mt-1 text-xs text-[#991B1B]"
+                      >
                         {errors.city}
                       </p>
                     )}
@@ -429,16 +471,24 @@ export function MarketCartView({
                     </label>
                     <input
                       id="co-address"
+                      name="street-address"
                       type="text"
+                      autoComplete="street-address"
                       value={form.address}
                       onChange={(e) =>
                         setForm({ ...form, address: e.target.value })
                       }
+                      aria-invalid={Boolean(errors.address)}
+                      aria-describedby={errors.address ? 'co-address-error' : undefined}
                       placeholder="Ex. : Haie Vive, près de la pharmacie"
-                      className="w-full rounded-[10px] border border-[#E7E2D9] px-3 py-2 text-sm text-[#201F1C]"
+                      className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3 py-2 text-base sm:text-sm text-[#201F1C]"
                     />
                     {errors.address && (
-                      <p className="mt-1 text-xs text-[#991B1B]">
+                      <p
+                        id="co-address-error"
+                        aria-live="polite"
+                        className="mt-1 text-xs text-[#991B1B]"
+                      >
                         {errors.address}
                       </p>
                     )}
@@ -457,14 +507,23 @@ export function MarketCartView({
                           onClick={() =>
                             setForm({ ...form, paymentMethod: method })
                           }
-                          className={`inline-flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-xs font-display font-semibold transition-colors cursor-pointer ${
+                          className={`inline-flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-xs font-display font-semibold active:scale-[0.97] transition-[background-color,border-color,transform] cursor-pointer ${
                             form.paymentMethod === method
                               ? 'border-[#C08A2E] bg-[#F2E9DA] text-[#2B211B]'
                               : 'border-[#E7E2D9] bg-white text-[#44403C]'
                           }`}
                         >
                           <PaymentMethodIcon method={method} className="w-4 h-4 shrink-0" />
-                          <span className="truncate">{PAYMENT_METHOD_LABELS[method]}</span>
+                          <span
+                            translate={
+                              method === 'mtn_money' || method === 'moov_money'
+                                ? 'no'
+                                : undefined
+                            }
+                            className="truncate"
+                          >
+                            {PAYMENT_METHOD_LABELS[method]}
+                          </span>
                         </button>
                       ))}
                     </div>
@@ -472,7 +531,7 @@ export function MarketCartView({
 
                   <button
                     type="submit"
-                    className="w-full rounded-[10px] bg-[#8A5A36] px-5 py-3.5 text-sm font-display font-bold text-[#FDFCFB] hover:bg-[#74492A] transition-colors cursor-pointer"
+                    className="w-full rounded-[10px] bg-[#8A5A36] px-5 py-3.5 text-sm font-display font-bold text-[#FDFCFB] hover:bg-[#74492A] active:scale-[0.98] transition-[background-color,transform] duration-150 cursor-pointer"
                   >
                     Confirmer la commande ·{' '}
                     {formatPriceFcfa(totals.totalFcfa)}
@@ -484,66 +543,69 @@ export function MarketCartView({
         </div>
       )}
 
-      {/* Auth Gate Modal / Bottom Sheet */}
-      {authModalOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="auth-gate-title"
-          className="fixed inset-0 z-50 bg-[#2B211B]/55 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4"
-        >
-          <div className="relative w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl bg-[#FDFCFB] border border-[#E7E2D9] p-6 sm:p-8 text-center space-y-5 shadow-layer-lg">
-            <button
-              type="button"
-              onClick={() => setAuthModalOpen(false)}
-              aria-label="Fermer l’invitation à se connecter"
-              className="absolute top-4 right-4 w-9 h-9 rounded-full border border-[#E7E2D9] bg-[#F5F3EF] flex items-center justify-center text-[#201F1C] cursor-pointer"
-            >
-              <X className="w-4 h-4" aria-hidden="true" />
-            </button>
-
-            <div className="w-12 h-12 rounded-2xl bg-[#C08A2E] text-[#201F1C] flex items-center justify-center mx-auto">
-              <ShoppingBag className="w-5 h-5" aria-hidden="true" />
-            </div>
-
-            <div className="space-y-2">
-              <h2
-                id="auth-gate-title"
-                className="font-display text-xl font-bold text-[#201F1C]"
-              >
-                Connectez-vous pour commander
-              </h2>
-              <p className="font-body text-sm text-[#44403C]">
-                Vos pièces restent dans votre panier. Une fois connecté, vous
-                finalisez votre commande en quelques secondes.
-              </p>
-            </div>
-
-            <div className="space-y-3 pt-1">
+      {/* Auth Gate Modal / Bottom Sheet rendered via Portal so #app-shell can be marked inert */}
+      {authModalOpen &&
+        createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="auth-gate-title"
+            className="fixed inset-0 z-[300] glass-surface-dark flex items-end sm:items-center justify-center p-0 sm:p-4"
+          >
+            <div className="relative w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl bg-[#FDFCFB] border border-[#E7E2D9] p-6 pb-[calc(1.75rem+env(safe-area-inset-bottom))] sm:p-8 text-center space-y-5 shadow-layer-lg">
               <button
+                ref={authCloseBtnRef}
                 type="button"
-                onClick={() => {
-                  setAuthModalOpen(false);
-                  onRequireAuth();
-                }}
-                className="w-full rounded-[10px] bg-[#C08A2E] px-5 py-3.5 text-sm font-display font-bold text-[#201F1C] hover:bg-[#D4973B] transition-colors cursor-pointer"
+                onClick={closeAuthModal}
+                aria-label="Fermer l’invitation à se connecter"
+                className="absolute top-4 right-4 w-10 h-10 rounded-full border border-[#E7E2D9] bg-[#F5F3EF] flex items-center justify-center text-[#201F1C] hover:bg-[#E7E2D9]/60 active:scale-[0.95] transition-transform cursor-pointer"
               >
-                Se connecter
+                <X className="w-4 h-4" aria-hidden="true" />
               </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthModalOpen(false);
-                  onRequireAuth();
-                }}
-                className="font-display text-xs font-semibold text-[#201F1C] underline underline-offset-4 cursor-pointer"
-              >
-                Pas encore de compte ? Créer un compte
-              </button>
+
+              <div className="w-12 h-12 rounded-2xl bg-[#C08A2E] text-[#201F1C] flex items-center justify-center mx-auto">
+                <ShoppingBag className="w-5 h-5" aria-hidden="true" />
+              </div>
+
+              <div className="space-y-2">
+                <h2
+                  id="auth-gate-title"
+                  className="font-display text-xl font-bold text-[#201F1C]"
+                >
+                  Connectez-vous pour commander
+                </h2>
+                <p className="font-body text-sm text-[#44403C]">
+                  Vos pièces restent dans votre panier. Une fois connecté, vous
+                  finalisez votre commande en quelques secondes.
+                </p>
+              </div>
+
+              <div className="space-y-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthModalOpen(false);
+                    onRequireAuth();
+                  }}
+                  className="w-full rounded-[10px] bg-[#C08A2E] px-5 py-3.5 text-sm font-display font-bold text-[#201F1C] hover:bg-[#D4973B] active:scale-[0.98] transition-[background-color,transform] duration-150 cursor-pointer"
+                >
+                  Se connecter
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthModalOpen(false);
+                    onRequireAuth();
+                  }}
+                  className="font-display text-xs font-semibold text-[#201F1C] underline underline-offset-4 cursor-pointer"
+                >
+                  Pas encore de compte ? Créer un compte
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

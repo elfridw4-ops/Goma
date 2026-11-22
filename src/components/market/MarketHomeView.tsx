@@ -79,7 +79,7 @@ export function MarketHomeView({
                     onChangeCondition(activeBanner.condition);
                     onGoCatalogue();
                   }}
-                  className="inline-flex items-center gap-2 rounded-[10px] bg-[#2B211B] px-4 py-2.5 text-xs sm:text-sm font-display font-semibold text-[#FDFCFB] hover:bg-[#201F1C] transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-2 rounded-[10px] bg-[#2B211B] px-4 py-2.5 text-xs sm:text-sm font-display font-semibold text-[#FDFCFB] hover:bg-[#201F1C] active:scale-[0.97] transition-[background-color,transform] duration-150 cursor-pointer"
                 >
                   <span>{activeBanner.ctaLabel}</span>
                   <ChevronRight className="w-4 h-4" aria-hidden="true" />
@@ -91,23 +91,30 @@ export function MarketHomeView({
               <ResilientImage
                 src={activeBanner.imageUrl}
                 alt={activeBanner.title}
+                priority
                 className="w-full h-full object-cover"
               />
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-1">
           {MARKET_BANNERS.map((banner, idx) => (
             <button
               key={banner.id}
               type="button"
               aria-label={`Afficher la bannière ${idx + 1}`}
+              aria-pressed={idx === bannerIdx}
               onClick={() => setBannerIdx(idx)}
-              className={`h-1.5 rounded-full transition-all cursor-pointer ${
-                idx === bannerIdx ? 'w-7 bg-[#8A5A36]' : 'w-2 bg-[#E7E2D9]'
-              }`}
-            />
+              className="min-w-[28px] min-h-[28px] flex items-center justify-center px-1 cursor-pointer"
+            >
+              <span
+                aria-hidden="true"
+                className={`block h-1.5 rounded-full transition-[width,background-color] duration-200 ease-out ${
+                  idx === bannerIdx ? 'w-7 bg-[#8A5A36]' : 'w-2 bg-[#E7E2D9]'
+                }`}
+              />
+            </button>
           ))}
         </div>
       </section>
@@ -131,7 +138,7 @@ export function MarketHomeView({
           </button>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 contain-grid">
           {SEGMENTS.map((segment, idx) => {
             const visual = SEGMENT_VISUALS[segment];
             return (
@@ -139,7 +146,7 @@ export function MarketHomeView({
                 key={segment}
                 type="button"
                 onClick={() => onSelectSegment(segment)}
-                className={`group relative overflow-hidden rounded-xl border border-[#E7E2D9] bg-white text-left hover:border-[#C08A2E] transition-all cursor-pointer ${
+                className={`group relative overflow-hidden rounded-xl border border-[#E7E2D9] bg-white text-left hover:border-[#C08A2E] active:scale-[0.98] transition-[border-color,box-shadow,transform] duration-200 cursor-pointer ${
                   idx === SEGMENTS.length - 1 ? 'col-span-2 sm:col-span-1' : ''
                 }`}
               >
@@ -267,7 +274,7 @@ export function MarketHomeView({
           </button>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5 contain-grid">
           {displayPool.map((product) => (
             <ProductCard
               key={`all-${product.id}`}
@@ -299,14 +306,14 @@ export function MarketHomeView({
             <button
               type="button"
               onClick={() => onGoAssistant('buyer')}
-              className="rounded-[10px] bg-[#8A5A36] px-4 py-2.5 text-xs sm:text-sm font-display font-semibold text-[#FDFCFB] hover:bg-[#74492A] transition-colors cursor-pointer"
+              className="rounded-[10px] bg-[#8A5A36] px-4 py-2.5 text-xs sm:text-sm font-display font-semibold text-[#FDFCFB] hover:bg-[#74492A] active:scale-[0.97] transition-[background-color,transform] duration-150 cursor-pointer"
             >
               Conseiller acheteur IA
             </button>
             <button
               type="button"
               onClick={() => onGoAssistant('seller')}
-              className="rounded-[10px] border border-[#E7E2D9] bg-white px-4 py-2.5 text-xs sm:text-sm font-display font-semibold text-[#201F1C] hover:border-[#8A5A36] transition-colors cursor-pointer"
+              className="rounded-[10px] border border-[#E7E2D9] bg-white px-4 py-2.5 text-xs sm:text-sm font-display font-semibold text-[#201F1C] hover:border-[#8A5A36] active:scale-[0.97] transition-[border-color,transform] duration-150 cursor-pointer"
             >
               Vendre une pièce
             </button>

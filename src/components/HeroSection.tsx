@@ -33,10 +33,11 @@ export function HeroSection({
       {/* Edge-to-edge full-viewport parallax showroom visual */}
       <motion.div
         style={{ y: imageY, scale: imageScale }}
-        className="absolute inset-0 will-change-transform"
+        className="absolute inset-0"
       >
         <ResilientImage
           src={HERO_IMAGE_URL}
+          priority
           alt="Showroom Delano Collection sur la marketplace Goma — manteaux argile, surchemises moutarde et maille mérinos"
           className="w-full h-full object-cover object-center"
         />
@@ -61,11 +62,12 @@ export function HeroSection({
       >
         <div className="max-w-2xl">
           <p className="text-xs sm:text-sm font-display font-semibold tracking-[0.06em] text-[#D4973B] mb-4">
-            Goma Marketplace · Delano Collection
+            <span translate="no">Goma Marketplace</span> ·{' '}
+            <span translate="no">Delano Collection</span>
           </p>
 
           <h1 className="font-display text-[clamp(2.25rem,4.5vw,3.75rem)] font-bold leading-[1.06] tracking-[-0.02em] text-[#FDFCFB] [text-wrap:balance] mb-5">
-            DELANO COLLECTION, votre référence en vêtements et accessoires.
+            <span translate="no">DELANO COLLECTION</span>, votre référence en vêtements et accessoires.
           </h1>
 
           <p className="font-body text-base sm:text-lg leading-[1.65] text-[#F2E9DA] max-w-xl mb-8">

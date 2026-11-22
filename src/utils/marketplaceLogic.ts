@@ -324,7 +324,7 @@ export function validateCheckoutForm(
 
   const delivery = checkDeliveryByCity(values.city, 0);
   if (!delivery.deliverable) {
-    errors.city = 'Sélectionnez une ville desservie (Cotonou, Calavi, Porto-Novo...).';
+    errors.city = 'Sélectionnez une ville desservie (Cotonou, Calavi, Porto-Novo…).';
   }
 
   if (values.address.trim().length < 4) {
@@ -470,3 +470,79 @@ export function mergeWishlistOnAuth(
   };
 }
 
+export interface UrlSearchState {
+  etat?: ProductCondition | 'all';
+  segment?: MarketSegment;
+  q?: string;
+  sort?: SortOption;
+  tab?: 'buyer' | 'seller';
+}
+
+const VALID_SEGMENTS: MarketSegment[] = [
+  'Tous',
+  'Homme',
+  'Femme',
+  'Chaussure',
+  'Enfant',
+  'Accessoires',
+];
+
+const VALID_SORTS: SortOption[] = ['featured', 'price-asc', 'price-desc'];
+
+export function parseUrlSearchState(search: string): UrlSearchState {
+  const params = new URLSearchParams(search);
+  const result: UrlSearchState = {};
+
+  const etat = params.get('etat');
+  if (etat === 'neuf' || etat === 'frip' || etat === 'all') {
+    result.etat = etat;
+  }
+
+  const segment = params.get('segment') as MarketSegment | null;
+  if (segment && VALID_SEGMENTS.includes(segment)) {
+    result.segment = segment;
+  }
+
+  const q = params.get('q');
+  if (q !== null) {
+    result.q = q;
+  }
+
+  const sort = params.get('sort') as SortOption | null;
+  if (sort && VALID_SORTS.includes(sort)) {
+    result.sort = sort;
+  }
+
+  const tab = params.get('tab');
+  if (tab === 'buyer' || tab === 'seller') {
+    result.tab = tab;
+  }
+
+  return result;
+}
+
+export function buildUrlWithSearchState(
+  pathname: string,
+  state: UrlSearchState,
+): string {
+  const params = new URLSearchParams();
+
+  if (state.etat && state.etat !== 'all') {
+    params.set('etat', state.etat);
+  }
+  if (state.segment && state.segment !== 'Tous') {
+    params.set('segment', state.segment);
+  }
+  if (state.q && state.q.trim() !== '') {
+    params.set('q', state.q.trim());
+  }
+  if (state.sort && state.sort !== 'featured') {
+    params.set('sort', state.sort);
+  }
+  if (state.tab && state.tab !== 'buyer') {
+    params.set('tab', state.tab);
+  }
+
+  const qs = params.toString();
+  return qs ? `${pathname}?${qs}` : pathname;
+}

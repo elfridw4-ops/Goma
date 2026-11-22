@@ -176,8 +176,8 @@ export function MarketCatalogueView({
               type="search"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Rechercher robe, lin, sneakers, Cotonou, Calavi..."
-              className="w-full rounded-[10px] border border-[#E7E2D9] bg-white pl-10 pr-4 py-2.5 text-sm text-[#201F1C] placeholder:text-[#78716C] focus:border-[#8A5A36] focus:outline-none"
+              placeholder="Rechercher robe, lin, sneakers, Cotonou, Calavi…"
+              className="w-full rounded-[10px] border border-[#E7E2D9] bg-white pl-10 pr-4 py-2.5 text-base sm:text-sm text-[#201F1C] placeholder:text-[#78716C] focus:border-[#8A5A36]"
             />
           </div>
 
@@ -189,7 +189,7 @@ export function MarketCatalogueView({
               id="market-sort"
               value={sortBy}
               onChange={(e) => onSortChange(e.target.value as SortOption)}
-              className="w-full sm:w-auto rounded-[10px] border border-[#E7E2D9] bg-white px-4 py-2.5 text-sm font-display text-[#201F1C] focus:border-[#8A5A36] focus:outline-none cursor-pointer"
+              className="w-full sm:w-auto rounded-[10px] border border-[#E7E2D9] bg-white px-4 py-2.5 text-base sm:text-sm font-display text-[#201F1C] focus:border-[#8A5A36] cursor-pointer"
             >
               <option value="featured">Tri : Pertinence</option>
               <option value="price-asc">Prix croissant</option>
@@ -210,13 +210,13 @@ export function MarketCatalogueView({
           <button
             type="button"
             onClick={onResetFilters}
-            className="rounded-[10px] border border-[#E7E2D9] bg-white px-4 py-2 text-sm font-display font-semibold text-[#8A5A36] hover:border-[#8A5A36] cursor-pointer"
+            className="rounded-[10px] border border-[#E7E2D9] bg-white px-4 py-2 text-sm font-display font-semibold text-[#8A5A36] hover:border-[#8A5A36] active:scale-[0.97] transition-[border-color,transform] duration-150 cursor-pointer"
           >
             Réinitialiser les filtres
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5 contain-grid">
           {products.map((product) => (
             <ProductCard
               key={product.id}

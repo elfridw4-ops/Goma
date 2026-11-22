@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Check,
   ChevronLeft,
@@ -23,6 +24,7 @@ import {
   checkDeliveryByCity,
   formatPriceFcfa,
 } from '../../utils/marketplaceLogic';
+import { useModalAccessibility } from '../../utils/useModalAccessibility';
 import { PaymentMethodIcon } from '../icons/BrandIcons';
 import { ResilientImage } from '../ResilientImage';
 import { ProductCard } from './ProductCard';
@@ -67,6 +69,13 @@ export function ProductDetailView({
     useState<DeliveryCheckResult | null>(null);
   const [zoomOpen, setZoomOpen] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
+  const zoomCloseBtnRef = useRef<HTMLButtonElement>(null);
+
+  const closeZoom = useCallback(() => {
+    setZoomOpen(false);
+  }, []);
+
+  useModalAccessibility(zoomOpen, closeZoom, zoomCloseBtnRef);
 
   useEffect(() => {
     setImageIdx(0);
@@ -99,7 +108,7 @@ export function ProductDetailView({
   };
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 sm:px-6 py-4 sm:py-8 pb-28 md:pb-14">
+    <div className="mx-auto max-w-[1200px] px-4 sm:px-6 py-4 sm:py-8 pb-32 md:pb-14">
       {/* Main 2-column PDP split */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
         {/* Left: Sticky Photo Gallery */}
@@ -107,6 +116,7 @@ export function ProductDetailView({
           <div className="relative aspect-[4/3] sm:aspect-square lg:aspect-[4/3] rounded-2xl overflow-hidden bg-[#F5F3EF] border border-[#E7E2D9]">
             <ResilientImage
               src={currentImage}
+              priority
               alt={product.name}
               className="w-full h-full object-cover"
             />
@@ -265,7 +275,7 @@ export function ProductDetailView({
                   aria-label="Choisir la taille"
                   value={selectedSize}
                   onChange={(e) => setSelectedSize(e.target.value)}
-                  className="w-full bg-transparent font-display text-sm font-bold text-[#C08A2E] focus:outline-none cursor-pointer"
+                  className="w-full rounded bg-white px-1.5 py-1 font-display text-base sm:text-sm font-bold text-[#8A5A36] cursor-pointer"
                 >
                   {product.sizes.map((s) => (
                     <option key={s} value={s}>
@@ -305,7 +315,7 @@ export function ProductDetailView({
               type="button"
               disabled={isOutOfStock}
               onClick={() => onAddToCart(product, selectedSize)}
-              className="flex-1 rounded-[10px] bg-[#C08A2E] px-5 py-3.5 text-sm font-display font-bold text-[#201F1C] hover:bg-[#D4973B] disabled:opacity-50 transition-colors cursor-pointer"
+              className="flex-1 rounded-[10px] bg-[#C08A2E] px-5 py-3.5 text-sm font-display font-bold text-[#201F1C] hover:bg-[#D4973B] active:scale-[0.98] disabled:opacity-50 transition-[background-color,transform] duration-150 cursor-pointer"
             >
               {isOutOfStock
                 ? 'Rupture de stock'
@@ -316,7 +326,7 @@ export function ProductDetailView({
               type="button"
               disabled={isOutOfStock}
               onClick={() => onBuyNow(product, selectedSize)}
-              className="rounded-[10px] border border-[#2B211B] bg-[#2B211B] px-5 py-3.5 text-sm font-display font-bold text-[#FDFCFB] hover:bg-[#201F1C] disabled:opacity-50 transition-colors cursor-pointer"
+              className="rounded-[10px] border border-[#2B211B] bg-[#2B211B] px-5 py-3.5 text-sm font-display font-bold text-[#FDFCFB] hover:bg-[#201F1C] active:scale-[0.98] disabled:opacity-50 transition-[background-color,transform] duration-150 cursor-pointer"
             >
               Acheter
             </button>
@@ -370,7 +380,7 @@ export function ProductDetailView({
                 id="delivery-city-select"
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
-                className="flex-1 rounded-[10px] border border-[#E7E2D9] bg-[#FDFCFB] px-3 py-2.5 text-sm text-[#201F1C] focus:border-[#8A5A36] focus:outline-none"
+                className="flex-1 rounded-[10px] border border-[#E7E2D9] bg-[#FDFCFB] px-3 py-2.5 text-base sm:text-sm text-[#201F1C] focus:border-[#8A5A36]"
               >
                 {BENIN_CITIES.map((city) => (
                   <option key={city} value={city}>
@@ -382,7 +392,7 @@ export function ProductDetailView({
               <button
                 type="button"
                 onClick={handleVerifyDelivery}
-                className="rounded-[10px] bg-[#C08A2E] px-4 py-2.5 text-xs font-display font-bold uppercase tracking-wide text-[#201F1C] hover:bg-[#D4973B] transition-colors shrink-0 cursor-pointer"
+                className="rounded-[10px] bg-[#C08A2E] px-4 py-2.5 text-xs font-display font-bold uppercase tracking-wide text-[#201F1C] hover:bg-[#D4973B] active:scale-[0.97] transition-[background-color,transform] duration-150 shrink-0 cursor-pointer"
               >
                 Vérifier
               </button>
@@ -391,6 +401,7 @@ export function ProductDetailView({
             {deliveryCheck ? (
               <p
                 data-testid="delivery-check-result"
+                aria-live="polite"
                 className={`font-body text-xs leading-relaxed ${
                   deliveryCheck.deliverable
                     ? 'text-[#2B211B] font-medium'
@@ -412,7 +423,7 @@ export function ProductDetailView({
             <h2 className="font-mono-tabular text-xs font-semibold uppercase tracking-wide text-[#78716C]">
               Détail de la pièce
             </h2>
-            <p className="font-body text-sm sm:text-base leading-relaxed text-[#201F1C]">
+            <p className="font-body text-sm sm:text-base leading-relaxed text-[#201F1C] max-w-[65ch]">
               {product.description}
             </p>
             <p className="font-body text-xs text-[#78716C]">
@@ -432,7 +443,15 @@ export function ProductDetailView({
                   className="inline-flex items-center gap-2 rounded-lg border border-[#E7E2D9] bg-[#F5F3EF] px-3 py-1.5 font-display text-xs font-semibold text-[#201F1C]"
                 >
                   <PaymentMethodIcon method={method} className="w-4 h-4 shrink-0" />
-                  <span>{PAYMENT_METHOD_LABELS[method]}</span>
+                  <span
+                    translate={
+                      method === 'mtn_money' || method === 'moov_money'
+                        ? 'no'
+                        : undefined
+                    }
+                  >
+                    {PAYMENT_METHOD_LABELS[method]}
+                  </span>
                 </span>
               ))}
             </div>
@@ -483,7 +502,7 @@ export function ProductDetailView({
           >
             Pièces similaires
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5 contain-grid">
             {similarProducts.map((item) => (
               <ProductCard
                 key={item.id}
@@ -497,13 +516,13 @@ export function ProductDetailView({
         </section>
       )}
 
-      {/* Mobile Sticky Purchase Bar (<= 60px, replaces bottom nav on PDP) */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-[#FDFCFB]/95 backdrop-blur-md border-t border-[#E7E2D9] px-3 py-2.5 flex items-center gap-2">
+      {/* Mobile Sticky Purchase Bar (safe-area aware, replaces bottom nav on PDP) */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-[100] glass-surface-light border-t border-[#2B211B]/12 px-3 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] flex items-center gap-2">
         <button
           type="button"
           disabled={isOutOfStock}
           onClick={() => onAddToCart(product, selectedSize)}
-          className="flex-1 rounded-[10px] bg-[#C08A2E] px-4 py-3 text-xs font-display font-bold text-[#201F1C] disabled:opacity-50 whitespace-nowrap truncate cursor-pointer"
+          className="flex-1 rounded-[10px] bg-[#C08A2E] px-4 py-3 text-xs font-display font-bold text-[#201F1C] disabled:opacity-50 whitespace-nowrap truncate active:scale-[0.98] transition-transform cursor-pointer"
         >
           {isOutOfStock
             ? 'Rupture de stock'
@@ -514,37 +533,41 @@ export function ProductDetailView({
           type="button"
           disabled={isOutOfStock}
           onClick={() => onBuyNow(product, selectedSize)}
-          className="rounded-[10px] border border-[#2B211B] bg-[#2B211B] px-4 py-3 text-xs font-display font-bold text-[#FDFCFB] disabled:opacity-50 shrink-0 cursor-pointer"
+          className="rounded-[10px] border border-[#2B211B] bg-[#2B211B] px-4 py-3 text-xs font-display font-bold text-[#FDFCFB] disabled:opacity-50 shrink-0 active:scale-[0.98] transition-transform cursor-pointer"
         >
           Acheter
         </button>
       </div>
 
-      {/* Lightbox Zoom */}
-      {zoomOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={`Agrandissement ${product.name}`}
-          className="fixed inset-0 z-50 bg-[#2B211B]/90 flex items-center justify-center p-4"
-        >
-          <button
-            type="button"
-            onClick={() => setZoomOpen(false)}
-            aria-label="Fermer l’agrandissement"
-            className="absolute top-4 right-4 w-11 h-11 rounded-full bg-white text-[#201F1C] flex items-center justify-center cursor-pointer"
+      {/* Lightbox Zoom rendered via Portal so #app-shell can be marked inert */}
+      {zoomOpen &&
+        createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Agrandissement ${product.name}`}
+            className="fixed inset-0 z-[300] glass-surface-toast flex items-center justify-center p-4"
           >
-            <X className="w-5 h-5" aria-hidden="true" />
-          </button>
-          <div className="max-w-3xl w-full aspect-[4/3] rounded-2xl overflow-hidden bg-[#F5F3EF]">
-            <ResilientImage
-              src={currentImage}
-              alt={product.name}
-              className="w-full h-full object-contain"
-            />
-          </div>
-        </div>
-      )}
+            <button
+              ref={zoomCloseBtnRef}
+              type="button"
+              onClick={closeZoom}
+              aria-label="Fermer l’agrandissement"
+              className="absolute top-4 right-4 w-11 h-11 rounded-full bg-white text-[#201F1C] flex items-center justify-center shadow-layer-md active:scale-[0.95] transition-transform cursor-pointer"
+            >
+              <X className="w-5 h-5" aria-hidden="true" />
+            </button>
+            <div className="max-w-3xl w-full aspect-[4/3] rounded-2xl overflow-hidden bg-[#F5F3EF] shadow-layer-lg">
+              <ResilientImage
+                src={currentImage}
+                priority
+                alt={product.name}
+                className="w-full h-full object-contain"
+              />
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
