@@ -1,0 +1,6 @@
+{
+  "name": "Goma — Delano Collection",
+  "description": "DELANO COLLECTION, votre référence en vêtements et accessoires sur la marketplace Goma avec assistance IA personnalisée.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

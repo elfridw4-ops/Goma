@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #8A5A36;
+  --color-primary-hover: #74492A;
+  --color-secondary: #2B211B;
+  --color-accent: #C08A2E;
+  --color-accent-warm: #D4973B;
+  --color-clay: #7A5B45;
+  --color-sand: #F2E9DA;
+  --color-canvas: #FDFCFB;
+  --color-surface-1: #FFFFFF;
+  --color-surface-2: #F5F3EF;
+  --color-border: #E7E2D9;
+  --color-text-high: #201F1C;
+  --color-text-medium: #44403C;
+  --color-text-muted: #78716C;
+
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Source Serif 4", ui-serif, Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  --bg-canvas: #FDFCFB;
+  --bg-surface-1: #FFFFFF;
+  --bg-surface-2: #F5F3EF;
+  --bg-sand: #F2E9DA;
+  --bg-umber: #2B211B;
+  --color-primary: #8A5A36;
+  --color-secondary: #2B211B;
+  --color-accent: #C08A2E;
+  --color-clay: #7A5B45;
+  --color-border: #E7E2D9;
+  --text-high: #201F1C;
+  --text-medium: #44403C;
+  --text-muted: #78716C;
+  --shadow-sm: 0 1px 2px 0 rgba(43, 33, 27, 0.05), 0 1px 3px 1px rgba(43, 33, 27, 0.03);
+  --shadow-md: 0 4px 6px -1px rgba(43, 33, 27, 0.07), 0 2px 4px -2px rgba(43, 33, 27, 0.05);
+  --shadow-lg: 0 10px 25px -4px rgba(43, 33, 27, 0.12), 0 4px 10px -4px rgba(43, 33, 27, 0.06);
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--bg-canvas);
+  color: var(--text-high);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-canvas);
+  color: var(--text-high);
+  overflow-x: clip;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+.font-mono-tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.shadow-layer-sm {
+  box-shadow: var(--shadow-sm);
+}
+
+.shadow-layer-md {
+  box-shadow: var(--shadow-md);
+}
+
+.shadow-layer-lg {
+  box-shadow: var(--shadow-lg);
+}
+
+/* Subtle organic grain texture preventing digital banding */
+.grain-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  mix-blend-mode: multiply;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

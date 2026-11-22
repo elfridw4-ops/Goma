@@ -1,0 +1,326 @@
+import { useState } from 'react';
+import { ChevronRight, Sparkles } from 'lucide-react';
+import {
+  AUTH_LOOKBOOK_IMAGE,
+  MARKET_BANNERS,
+  SEGMENT_VISUALS,
+} from '../../data/catalog';
+import type {
+  MarketSegment,
+  Product,
+  ProductCondition,
+} from '../../types/marketplace';
+import { SegmentIcon } from '../icons/BrandIcons';
+import { ResilientImage } from '../ResilientImage';
+import { ProductCard } from './ProductCard';
+
+interface MarketHomeViewProps {
+  products: Product[];
+  condition: ProductCondition;
+  wishlistIds: string[];
+  onToggleWishlist: (productId: string) => void;
+  onChangeCondition: (condition: ProductCondition) => void;
+  onSelectSegment: (segment: MarketSegment) => void;
+  onSelectProduct: (product: Product) => void;
+  onGoCatalogue: () => void;
+  onGoAssistant: (tab: 'buyer' | 'seller') => void;
+}
+
+const SEGMENTS: Exclude<MarketSegment, 'Tous'>[] = [
+  'Homme',
+  'Femme',
+  'Chaussure',
+  'Enfant',
+  'Accessoires',
+];
+
+export function MarketHomeView({
+  products,
+  condition,
+  wishlistIds,
+  onToggleWishlist,
+  onChangeCondition,
+  onSelectSegment,
+  onSelectProduct,
+  onGoCatalogue,
+  onGoAssistant,
+}: MarketHomeViewProps) {
+  const [bannerIdx, setBannerIdx] = useState(condition === 'frip' ? 0 : 1);
+
+  const activeBanner = MARKET_BANNERS[bannerIdx] ?? MARKET_BANNERS[0];
+
+  const conditionProducts = products.filter((p) => p.condition === condition);
+  const displayPool =
+    conditionProducts.length > 0 ? conditionProducts : products;
+
+  const newArrivals = displayPool.filter((p) => p.isNewArrival);
+  const bestSellers = displayPool.filter((p) => p.isBestSeller);
+
+  return (
+    <div className="mx-auto max-w-[1200px] px-4 sm:px-6 py-6 sm:py-8 space-y-10 pb-24 md:pb-14">
+      {/* Promotional Banner Carousel (Argile & Moutarde) */}
+      <section aria-label="Sélection mise en avant" className="space-y-3">
+        <div className="relative overflow-hidden rounded-2xl bg-[#C08A2E] text-[#201F1C] border border-[#8A5A36]/25 shadow-layer-sm">
+          <div className="grid grid-cols-1 md:grid-cols-12 items-stretch">
+            <div className="md:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-center space-y-3">
+              <p className="font-mono-tabular text-[11px] font-semibold uppercase tracking-wider text-[#2B211B]/85">
+                {activeBanner.eyebrow}
+              </p>
+              <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-tight text-[#201F1C] [text-wrap:balance]">
+                {activeBanner.title}
+              </h1>
+              <p className="font-body text-sm sm:text-base text-[#2B211B]/90 max-w-lg">
+                {activeBanner.subtitle}
+              </p>
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChangeCondition(activeBanner.condition);
+                    onGoCatalogue();
+                  }}
+                  className="inline-flex items-center gap-2 rounded-[10px] bg-[#2B211B] px-4 py-2.5 text-xs sm:text-sm font-display font-semibold text-[#FDFCFB] hover:bg-[#201F1C] transition-colors cursor-pointer"
+                >
+                  <span>{activeBanner.ctaLabel}</span>
+                  <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+
+            <div className="h-44 md:h-auto md:col-span-5 bg-[#F2E9DA] relative">
+              <ResilientImage
+                src={activeBanner.imageUrl}
+                alt={activeBanner.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-center gap-2">
+          {MARKET_BANNERS.map((banner, idx) => (
+            <button
+              key={banner.id}
+              type="button"
+              aria-label={`Afficher la bannière ${idx + 1}`}
+              onClick={() => setBannerIdx(idx)}
+              className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                idx === bannerIdx ? 'w-7 bg-[#8A5A36]' : 'w-2 bg-[#E7E2D9]'
+              }`}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* Par catégories with thumbnail photography + Lucide icons */}
+      <section aria-labelledby="heading-categories" className="space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <h2
+            id="heading-categories"
+            className="font-display text-lg sm:text-xl font-bold text-[#201F1C]"
+          >
+            Par catégories
+          </h2>
+          <button
+            type="button"
+            onClick={onGoCatalogue}
+            className="inline-flex items-center gap-0.5 font-display text-xs sm:text-sm font-semibold text-[#8A5A36] hover:text-[#2B211B] cursor-pointer"
+          >
+            <span>Tout voir</span>
+            <ChevronRight className="w-4 h-4" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          {SEGMENTS.map((segment, idx) => {
+            const visual = SEGMENT_VISUALS[segment];
+            return (
+              <button
+                key={segment}
+                type="button"
+                onClick={() => onSelectSegment(segment)}
+                className={`group relative overflow-hidden rounded-xl border border-[#E7E2D9] bg-white text-left hover:border-[#C08A2E] transition-all cursor-pointer ${
+                  idx === SEGMENTS.length - 1 ? 'col-span-2 sm:col-span-1' : ''
+                }`}
+              >
+                <div className="aspect-[16/10] w-full bg-[#F5F3EF] overflow-hidden">
+                  <ResilientImage
+                    src={visual.imageUrl}
+                    alt={segment}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+                <div className="p-3 flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="font-display text-sm font-bold text-[#201F1C] truncate">
+                      {segment}
+                    </p>
+                    <p className="font-body text-[11px] text-[#78716C] truncate">
+                      {visual.subtitle}
+                    </p>
+                  </div>
+                  <span className="w-7 h-7 rounded-lg bg-[#F5F3EF] text-[#8A5A36] flex items-center justify-center shrink-0">
+                    <SegmentIcon segment={segment} className="w-3.5 h-3.5" />
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Nouveautés */}
+      <section aria-labelledby="heading-nouveautes" className="space-y-4">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2
+              id="heading-nouveautes"
+              className="font-display text-lg sm:text-xl font-bold text-[#201F1C]"
+            >
+              Nouveautés
+            </h2>
+            <p className="font-body text-xs sm:text-sm text-[#78716C]">
+              Nos derniers arrivages · Mode{' '}
+              {condition === 'frip' ? 'Friperie' : 'Neuf'}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onGoCatalogue}
+            className="inline-flex items-center gap-0.5 font-display text-xs sm:text-sm font-semibold text-[#8A5A36] hover:text-[#2B211B] cursor-pointer shrink-0"
+          >
+            <span>Tout voir</span>
+            <ChevronRight className="w-4 h-4" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="flex gap-3 sm:gap-5 overflow-x-auto pb-2 snap-x">
+          {(newArrivals.length > 0 ? newArrivals : displayPool).map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              isWishlisted={wishlistIds.includes(product.id)}
+              onToggleWishlist={onToggleWishlist}
+              onSelect={onSelectProduct}
+              className="min-w-[168px] w-[168px] sm:min-w-[225px] sm:w-[225px] snap-start shrink-0"
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* Meilleures ventes */}
+      <section aria-labelledby="heading-bestsellers" className="space-y-4">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2
+              id="heading-bestsellers"
+              className="font-display text-lg sm:text-xl font-bold text-[#201F1C]"
+            >
+              Meilleures ventes
+            </h2>
+            <p className="font-body text-xs sm:text-sm text-[#78716C]">
+              Les plus demandés du moment
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onGoCatalogue}
+            className="inline-flex items-center gap-0.5 font-display text-xs sm:text-sm font-semibold text-[#8A5A36] hover:text-[#2B211B] cursor-pointer shrink-0"
+          >
+            <span>Tout voir</span>
+            <ChevronRight className="w-4 h-4" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="flex gap-3 sm:gap-5 overflow-x-auto pb-2 snap-x">
+          {(bestSellers.length > 0 ? bestSellers : products.slice(0, 4)).map(
+            (product) => (
+              <ProductCard
+                key={`bs-${product.id}`}
+                product={product}
+                isWishlisted={wishlistIds.includes(product.id)}
+                onToggleWishlist={onToggleWishlist}
+                onSelect={onSelectProduct}
+                className="min-w-[168px] w-[168px] sm:min-w-[225px] sm:w-[225px] snap-start shrink-0"
+              />
+            ),
+          )}
+        </div>
+      </section>
+
+      {/* Toutes les pièces */}
+      <section aria-labelledby="heading-all-items" className="space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <h2
+            id="heading-all-items"
+            className="font-display text-lg sm:text-xl font-bold text-[#201F1C]"
+          >
+            Toutes les pièces ({condition === 'frip' ? 'Frip' : 'Neuf'})
+          </h2>
+          <button
+            type="button"
+            onClick={onGoCatalogue}
+            className="inline-flex items-center gap-0.5 font-display text-xs sm:text-sm font-semibold text-[#8A5A36] hover:text-[#2B211B] cursor-pointer"
+          >
+            <span>Tout voir</span>
+            <ChevronRight className="w-4 h-4" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5">
+          {displayPool.map((product) => (
+            <ProductCard
+              key={`all-${product.id}`}
+              product={product}
+              isWishlisted={wishlistIds.includes(product.id)}
+              onToggleWishlist={onToggleWishlist}
+              onSelect={onSelectProduct}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* Integrated AI Assistant & Seller Studio entry with Atelier Lookbook Visual */}
+      <section className="overflow-hidden rounded-2xl border border-[#E7E2D9] bg-[#F5F3EF] grid grid-cols-1 md:grid-cols-12 items-stretch">
+        <div className="md:col-span-8 p-6 sm:p-8 flex flex-col justify-center space-y-4">
+          <div className="inline-flex items-center gap-1.5 text-xs font-display font-semibold text-[#8A5A36]">
+            <Sparkles className="w-4 h-4 text-[#C08A2E]" aria-hidden="true" />
+            <span>Assistant IA Goma</span>
+          </div>
+          <h2 className="font-display text-xl sm:text-2xl font-bold text-[#201F1C]">
+            Besoin d’un conseil style ou de publier un article ?
+          </h2>
+          <p className="font-body text-sm text-[#44403C] max-w-xl">
+            Notre conseiller vous aide à choisir selon votre budget en FCFA et
+            rédige vos fiches vendeur en moins d’une minute.
+          </p>
+
+          <div className="flex flex-wrap items-center gap-3 pt-1">
+            <button
+              type="button"
+              onClick={() => onGoAssistant('buyer')}
+              className="rounded-[10px] bg-[#8A5A36] px-4 py-2.5 text-xs sm:text-sm font-display font-semibold text-[#FDFCFB] hover:bg-[#74492A] transition-colors cursor-pointer"
+            >
+              Conseiller acheteur IA
+            </button>
+            <button
+              type="button"
+              onClick={() => onGoAssistant('seller')}
+              className="rounded-[10px] border border-[#E7E2D9] bg-white px-4 py-2.5 text-xs sm:text-sm font-display font-semibold text-[#201F1C] hover:border-[#8A5A36] transition-colors cursor-pointer"
+            >
+              Vendre une pièce
+            </button>
+          </div>
+        </div>
+
+        <div className="hidden md:block md:col-span-4 bg-[#2B211B]">
+          <ResilientImage
+            src={AUTH_LOOKBOOK_IMAGE}
+            alt="Atelier Goma Delano Collection"
+            className="w-full h-full object-cover"
+          />
+        </div>
+      </section>
+    </div>
+  );
+}
