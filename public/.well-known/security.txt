@@ -1,6 +1,6 @@
 Contact: mailto:security@delano-collection.bj
 Expires: 2027-12-31T23:59:59.000Z
 Preferred-Languages: fr, en
-Canonical: https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/.well-known/security.txt
-Policy: https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/security-policy
-Acknowledgments: https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/hall-of-fame
+Canonical: https://goma-nine.vercel.app/.well-known/security.txt
+Policy: https://goma-nine.vercel.app/security-policy
+Acknowledgments: https://goma-nine.vercel.app/hall-of-fame

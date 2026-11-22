@@ -12,11 +12,11 @@
 
 ## Espaces de l'Application
 
-1. [Vitrine Éditoriale Delano Collection](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/) : Présentation de l'univers de la maison, storytelling textile, engagement éco-responsable et sélection de départ.
-2. [Marketplace Hub](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market) : Accès rapide aux univers Neuf & Frip, catégories phares, nouveautés et boutiques vérifiées.
-3. [Catalogue Complet](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/catalogue) : Moteur de recherche et filtres par univers (Neuf / Frip), segments (Femme, Homme, Chaussure, Enfant, Accessoires), gammes de prix en FCFA et disponibilité.
-4. [Conseiller Style & Mise en Vente IA](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/assistant) : Assistant interactif basé sur Gemini analysant en temps réel le stock réel de la marketplace pour recommander des silhouettes complètes selon le budget et la morphologie de l'acheteur, ou rédiger les annonces des vendeurs béninois.
-5. [Panier & Commande](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/cart) : Gestion des pièces avec contrainte stricte d'exemplaire unique pour la friperie, vérification instantanée de la zone de livraison et sélection du mode de règlement.
+1. [Vitrine Éditoriale Delano Collection](https://goma-nine.vercel.app/) : Présentation de l'univers de la maison, storytelling textile, engagement éco-responsable et sélection de départ.
+2. [Marketplace Hub](https://goma-nine.vercel.app/market) : Accès rapide aux univers Neuf & Frip, catégories phares, nouveautés et boutiques vérifiées.
+3. [Catalogue Complet](https://goma-nine.vercel.app/market/catalogue) : Moteur de recherche et filtres par univers (Neuf / Frip), segments (Femme, Homme, Chaussure, Enfant, Accessoires), gammes de prix en FCFA et disponibilité.
+4. [Conseiller Style & Mise en Vente IA](https://goma-nine.vercel.app/market/assistant) : Assistant interactif basé sur Gemini analysant en temps réel le stock réel de la marketplace pour recommander des silhouettes complètes selon le budget et la morphologie de l'acheteur, ou rédiger les annonces des vendeurs béninois.
+5. [Panier & Commande](https://goma-nine.vercel.app/market/cart) : Gestion des pièces avec contrainte stricte d'exemplaire unique pour la friperie, vérification instantanée de la zone de livraison et sélection du mode de règlement.
 
 ## Boutiques Partenaires
 
@@ -26,8 +26,8 @@
 
 ## Endpoints Techniques Publics
 
-- Spécification détaillée LLM : [/llms-full.txt](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/llms-full.txt)
-- Fichier robots : [/robots.txt](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/robots.txt)
-- Sitemap XML : [/sitemap.xml](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/sitemap.xml)
-- Web App Manifest : [/site.webmanifest](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/site.webmanifest)
-- Contact sécurité : [/.well-known/security.txt](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/.well-known/security.txt)
+- Spécification détaillée LLM : [/llms-full.txt](https://goma-nine.vercel.app/llms-full.txt)
+- Fichier robots : [/robots.txt](https://goma-nine.vercel.app/robots.txt)
+- Sitemap XML : [/sitemap.xml](https://goma-nine.vercel.app/sitemap.xml)
+- Web App Manifest : [/site.webmanifest](https://goma-nine.vercel.app/site.webmanifest)
+- Contact sécurité : [/.well-known/security.txt](https://goma-nine.vercel.app/.well-known/security.txt)

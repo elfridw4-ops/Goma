@@ -191,6 +191,72 @@ async function startServer() {
   });
 
   const publicPath = path.resolve(__dirname, 'public');
+
+  // Dynamic SEO files serving actual request host (no hardcoded domain)
+  app.get('/sitemap.xml', (req, res) => {
+    const filePath = path.join(publicPath, 'sitemap.xml');
+    if (fs.existsSync(filePath)) {
+      let content = fs.readFileSync(filePath, 'utf-8');
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      content = content.replace(/https:\/\/[^\s<>"]+/g, (match) => {
+        if (match.includes('sitemaps.org') || match.includes('schema.org')) return match;
+        return baseUrl;
+      });
+      res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+      res.send(content);
+    } else {
+      res.status(404).send('Not found');
+    }
+  });
+
+  app.get('/robots.txt', (req, res) => {
+    const filePath = path.join(publicPath, 'robots.txt');
+    if (fs.existsSync(filePath)) {
+      let content = fs.readFileSync(filePath, 'utf-8');
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      content = content.replace(/https:\/\/[^\s<>"]+/g, (match) => {
+        if (match.includes('sitemaps.org') || match.includes('schema.org')) return match;
+        return baseUrl;
+      });
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      res.send(content);
+    } else {
+      res.status(404).send('Not found');
+    }
+  });
+
+  app.get('/llms.txt', (req, res) => {
+    const filePath = path.join(publicPath, 'llms.txt');
+    if (fs.existsSync(filePath)) {
+      let content = fs.readFileSync(filePath, 'utf-8');
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      content = content.replace(/https:\/\/[^\s<>"]+/g, (match) => {
+        if (match.includes('schema.org')) return match;
+        return baseUrl;
+      });
+      res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+      res.send(content);
+    } else {
+      res.status(404).send('Not found');
+    }
+  });
+
+  app.get('/llms-full.txt', (req, res) => {
+    const filePath = path.join(publicPath, 'llms-full.txt');
+    if (fs.existsSync(filePath)) {
+      let content = fs.readFileSync(filePath, 'utf-8');
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      content = content.replace(/https:\/\/[^\s<>"]+/g, (match) => {
+        if (match.includes('schema.org')) return match;
+        return baseUrl;
+      });
+      res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+      res.send(content);
+    } else {
+      res.status(404).send('Not found');
+    }
+  });
+
   app.use(express.static(publicPath));
 
   if (process.env.NODE_ENV !== 'production') {

@@ -1,5 +1,5 @@
 # Robots.txt for Goma — Delano Collection
-# https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app
+# https://goma-nine.vercel.app
 
 # AI Crawlers & Answer Engines (GEO - Generative Engine Optimization)
 User-agent: GPTBot
@@ -41,4 +41,4 @@ Disallow: /api/
 Disallow: /market/checkout
 Disallow: /market/login
 
-Sitemap: https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/sitemap.xml
+Sitemap: https://goma-nine.vercel.app/sitemap.xml
