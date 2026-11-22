@@ -1,5 +1,10 @@
 import { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'motion/react';
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from 'motion/react';
 import { ArrowDown, ArrowRight } from 'lucide-react';
 import { HERO_IMAGE_URL } from '../data/catalog';
 import { ResilientImage } from './ResilientImage';
@@ -14,6 +19,7 @@ export function HeroSection({
   onDiscoverVitrine,
 }: HeroSectionProps) {
   const heroRef = useRef<HTMLElement>(null);
+  const shouldReduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ['start start', 'end start'],
@@ -32,7 +38,7 @@ export function HeroSection({
     >
       {/* Edge-to-edge full-viewport parallax showroom visual */}
       <motion.div
-        style={{ y: imageY, scale: imageScale }}
+        style={shouldReduceMotion ? undefined : { y: imageY, scale: imageScale }}
         className="absolute inset-0"
       >
         <ResilientImage
@@ -57,7 +63,7 @@ export function HeroSection({
       />
 
       <motion.div
-        style={{ y: contentY, opacity: contentOpacity }}
+        style={shouldReduceMotion ? undefined : { y: contentY, opacity: contentOpacity }}
         className="relative z-10 w-full mx-auto max-w-[1200px] px-4 sm:px-6 pt-32 pb-10 sm:pb-14 lg:pb-16"
       >
         <div className="max-w-2xl">
@@ -66,14 +72,14 @@ export function HeroSection({
             <span translate="no">Delano Collection</span>
           </p>
 
-          <h1 className="font-display text-[clamp(2.25rem,4.5vw,3.75rem)] font-bold leading-[1.06] tracking-[-0.02em] text-[#FDFCFB] [text-wrap:balance] mb-5">
+          <h1 className="font-display text-[clamp(2.25rem,4.5vw,3.75rem)] font-bold leading-[1.05] tracking-[-0.03em] text-[#FDFCFB] [text-wrap:balance] mb-5">
             <span translate="no">DELANO COLLECTION</span>, votre référence en vêtements et accessoires.
           </h1>
 
-          <p className="font-body text-base sm:text-lg leading-[1.65] text-[#F2E9DA] max-w-xl mb-8">
-            Découvrez une nouvelle façon d’acheter et de vendre grâce à
-            l’assistance IA personnalisée — pièces neuves, friperie sélectionnée
-            et boutiques locales livrées chez vous.
+          <p className="font-body text-base sm:text-lg leading-[1.65] text-[#F2E9DA] max-w-[60ch] mb-8">
+            Pièces neuves d’atelier, friperie triée au premier choix et conseil IA
+            sur votre taille et votre budget en FCFA — livrés en 48 h à Cotonou et
+            Abomey-Calavi.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-10 sm:mb-12">
@@ -89,7 +95,7 @@ export function HeroSection({
             <button
               type="button"
               onClick={onDiscoverVitrine}
-              className="inline-flex items-center gap-2 rounded-[10px] border border-[#F2E9DA]/45 bg-[#2B211B]/60 backdrop-blur-xs px-5 py-3.5 text-sm sm:text-base font-display font-semibold text-[#FDFCFB] whitespace-nowrap shrink-0 hover:border-[#D4973B] hover:bg-[#2B211B]/85 active:scale-[0.97] transition-[border-color,background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-[#D4973B] focus-visible:outline-offset-2 cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-[10px] border border-[#F2E9DA]/45 glass-surface-dark px-5 py-3.5 text-sm sm:text-base font-display font-semibold text-[#FDFCFB] whitespace-nowrap shrink-0 hover:border-[#D4973B] active:scale-[0.97] transition-[border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-[#D4973B] focus-visible:outline-offset-2 cursor-pointer"
             >
               <span>Découvrir la vitrine</span>
             </button>

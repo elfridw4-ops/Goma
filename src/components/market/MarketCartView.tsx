@@ -140,7 +140,7 @@ export function MarketCartView({
                 Commande {lastOrder.orderNumber} confirmée
               </p>
               <h2 className="font-display text-xl font-bold text-[#201F1C] mt-1">
-                Merci {lastOrder.customerName}, votre commande est enregistrée.
+                Commande enregistrée pour {lastOrder.customerName}.
               </h2>
             </div>
           </div>
@@ -160,7 +160,7 @@ export function MarketCartView({
             </div>
             <div className="flex justify-between pt-2 border-t border-[#E7E2D9]">
               <span className="font-display font-bold text-[#201F1C]">
-                Total réglé / dû
+                Montant total
               </span>
               <span className="font-mono-tabular font-bold text-[#C08A2E]">
                 {formatPriceFcfa(lastOrder.totalFcfa)}
@@ -480,7 +480,7 @@ export function MarketCartView({
                       }
                       aria-invalid={Boolean(errors.address)}
                       aria-describedby={errors.address ? 'co-address-error' : undefined}
-                      placeholder="Ex. : Haie Vive, près de la pharmacie"
+                      placeholder="Haie Vive, près de la pharmacie"
                       className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3 py-2 text-base sm:text-sm text-[#201F1C]"
                     />
                     {errors.address && (

@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GoogleGenAI, Type } from '@google/genai';
@@ -26,7 +27,7 @@ function getAiClient(): GoogleGenAI | null {
 
 async function startServer() {
   const app = express();
-  app.use(express.json({ limit: '1mb' }));
+  app.use(express.json({ limit: '10mb' }));
 
   app.get('/api/health', (_req, res) => {
     res.json({ ok: true, service: 'goma-delano-collection' });
@@ -122,7 +123,7 @@ async function startServer() {
 
         if (name.length < 2) {
           res.status(400).json({
-            error: 'Renseignez au moins le nom de l’article pour générer sa fiche SEO & GEO.',
+            error: 'Indiquez d’abord le nom de l’article pour rédiger l’annonce par IA.',
           });
           return;
         }
@@ -188,6 +189,9 @@ async function startServer() {
       });
     }
   });
+
+  const publicPath = path.resolve(__dirname, 'public');
+  app.use(express.static(publicPath));
 
   if (process.env.NODE_ENV !== 'production') {
     const { createServer: createViteServer } = await import('vite');

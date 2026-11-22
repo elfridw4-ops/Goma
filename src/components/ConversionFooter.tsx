@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react';
+import { PWAInstallButton } from './pwa/PWAInstallButton';
 
 interface ConversionFooterProps {
   onEnterMarketplace: () => void;
@@ -11,11 +12,11 @@ export function ConversionFooter({ onEnterMarketplace }: ConversionFooterProps) 
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pb-12 border-b border-[#F2E9DA]/15">
           <div className="max-w-lg">
             <h2 className="font-display text-2xl sm:text-3xl font-bold leading-tight text-[#FDFCFB] mb-2">
-              Prêt à entrer sur la marketplace Goma ?
+              Entrez sur la marketplace <span translate="no">Goma</span>.
             </h2>
             <p className="font-body text-sm sm:text-base text-[#F2E9DA]/80">
-              Explorez les collections neuves Delano Collection, nos pièces uniques
-              friperie et l’assistance IA personnalisée.
+              Parcourez les pièces neuves <span translate="no">Delano Collection</span>, la friperie
+              sélectionnée au premier choix et le conseiller IA en FCFA.
             </p>
           </div>
 
@@ -49,7 +50,7 @@ export function ConversionFooter({ onEnterMarketplace }: ConversionFooterProps) 
             © 2026 <span translate="no">Delano Collection</span> — Vitrine &amp; Marketplace vêtements et accessoires.
           </p>
 
-          <div className="flex flex-wrap items-center gap-6">
+          <div className="flex flex-wrap items-center gap-5">
             <a href="#univers" className="hover:text-[#FDFCFB] transition-colors">
               Univers
             </a>
@@ -59,8 +60,31 @@ export function ConversionFooter({ onEnterMarketplace }: ConversionFooterProps) 
             <a href="#boutiques" className="hover:text-[#FDFCFB] transition-colors">
               Maisons
             </a>
+            <a
+              href="/llms.txt"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#D4973B] hover:text-[#FDFCFB] transition-colors"
+            >
+              llms.txt
+            </a>
+            <a
+              href="/sitemap.xml"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[#FDFCFB] transition-colors"
+            >
+              Sitemap
+            </a>
             <span className="font-mono-tabular text-[#D4973B]">Français · FCFA</span>
           </div>
+        </div>
+
+        <div className="pt-4 flex flex-wrap items-center justify-between gap-4 border-t border-[#F2E9DA]/10 mt-6 text-xs text-[#F2E9DA]/60">
+          <PWAInstallButton variant="footer" className="text-[#F2E9DA]/75 hover:text-[#FDFCFB]" />
+          <span className="font-body text-[11px]">
+            Cotonou · Abomey-Calavi · Porto-Novo · Ouidah · Parakou
+          </span>
         </div>
       </div>
     </footer>

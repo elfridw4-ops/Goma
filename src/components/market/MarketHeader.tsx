@@ -1,6 +1,7 @@
 import { Heart, Search, ShoppingBag, Sparkles, Store, User } from 'lucide-react';
 import type { ProductCondition, UserSession } from '../../types/marketplace';
 import { GomaMarkIcon } from '../icons/BrandIcons';
+import { PWAInstallButton } from '../pwa/PWAInstallButton';
 
 interface MarketHeaderProps {
   condition: ProductCondition;
@@ -120,7 +121,7 @@ export function MarketHeader({
               }`}
             >
               <Sparkles className="w-3.5 h-3.5 text-[#C08A2E]" aria-hidden="true" />
-              <span>Assistant IA &amp; Vendre</span>
+              <span>Assistant IA &amp; Vente</span>
             </button>
             <button
               type="button"
@@ -134,6 +135,8 @@ export function MarketHeader({
 
           {/* Right actions */}
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+            <PWAInstallButton className="hidden lg:inline-flex mr-1" />
+
             <button
               type="button"
               onClick={onGoCatalogue}

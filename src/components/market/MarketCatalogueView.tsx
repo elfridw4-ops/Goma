@@ -176,7 +176,7 @@ export function MarketCatalogueView({
               type="search"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Rechercher robe, lin, sneakers, Cotonou, Calavi…"
+              placeholder="Robe, lin, sneakers, Cotonou, Calavi…"
               className="w-full rounded-[10px] border border-[#E7E2D9] bg-white pl-10 pr-4 py-2.5 text-base sm:text-sm text-[#201F1C] placeholder:text-[#78716C] focus:border-[#8A5A36]"
             />
           </div>
@@ -191,7 +191,7 @@ export function MarketCatalogueView({
               onChange={(e) => onSortChange(e.target.value as SortOption)}
               className="w-full sm:w-auto rounded-[10px] border border-[#E7E2D9] bg-white px-4 py-2.5 text-base sm:text-sm font-display text-[#201F1C] focus:border-[#8A5A36] cursor-pointer"
             >
-              <option value="featured">Tri : Pertinence</option>
+              <option value="featured">Trier par pertinence</option>
               <option value="price-asc">Prix croissant</option>
               <option value="price-desc">Prix décroissant</option>
             </select>

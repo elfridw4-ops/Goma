@@ -621,6 +621,7 @@ export const STORY_CHAPTERS: StoryChapter[] = [
 ];
 
 export interface Testimonial {
+  shopId: string;
   name: string;
   role: string;
   organization: string;
@@ -631,6 +632,7 @@ export interface Testimonial {
 
 export const TESTIMONIALS: Testimonial[] = [
   {
+    shopId: 'shop-delano-cotonou',
     name: 'Camille Delano',
     role: 'Directrice de collection',
     organization: 'Delano Cotonou · Haie Vive',
@@ -640,6 +642,7 @@ export const TESTIMONIALS: Testimonial[] = [
       'La vitrine porte l’identité de la maison tandis que la marketplace permet à nos clients béninois de commander ou réserver en deux minutes via Mobile Money.',
   },
   {
+    shopId: 'shop-chic-frip',
     name: 'Mireille Agbo',
     role: 'Fondatrice',
     organization: 'Chic Frip · Akpakpa',
@@ -649,6 +652,7 @@ export const TESTIMONIALS: Testimonial[] = [
       'Nos robes et hauts trouvent preneur en quelques heures grâce à la mise en ligne assistée et à la vérification immédiate des villes livrées.',
   },
   {
+    shopId: 'shop-atelier-calavi',
     name: 'Roméo Houndonougbo',
     role: 'Responsable Atelier',
     organization: 'Atelier Calavi · Abomey-Calavi',

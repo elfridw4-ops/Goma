@@ -89,7 +89,6 @@ export function ProductDetailView({
   const currentImage = images[imageIdx] ?? images[0];
 
   const handleShare = async () => {
-    const shareText = `${product.name} — ${formatPriceFcfa(product.priceFcfa)} sur Goma`;
     try {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(window.location.href);
@@ -100,7 +99,6 @@ export function ProductDetailView({
       setShareCopied(true);
       window.setTimeout(() => setShareCopied(false), 2400);
     }
-    void shareText;
   };
 
   const handleVerifyDelivery = () => {
@@ -155,7 +153,11 @@ export function ProductDetailView({
                 <button
                   type="button"
                   onClick={handleShare}
-                  aria-label="Partager cette pièce"
+                  aria-label={
+                    shareCopied
+                      ? 'Lien de la pièce copié'
+                      : 'Copier le lien de cette pièce'
+                  }
                   className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#FDFCFB]/90 backdrop-blur-xs border border-[#E7E2D9] text-[#201F1C] hover:bg-white cursor-pointer"
                 >
                   {shareCopied ? (
@@ -412,8 +414,8 @@ export function ProductDetailView({
               </p>
             ) : (
               <p className="font-body text-xs text-[#78716C]">
-                Si votre ville n’est pas dans la liste nous ne livrons pas à cette
-                adresse.
+                Votre ville est absente ? Choisissez le retrait en boutique à
+                Cotonou ou Calavi.
               </p>
             )}
           </div>

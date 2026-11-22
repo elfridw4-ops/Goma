@@ -161,7 +161,7 @@ export default async function handler(
       if (name.length < 2) {
         res.status(400).json({
           error:
-            'Renseignez au moins le nom de l’article pour générer sa fiche SEO & GEO.',
+            'Indiquez d’abord le nom de l’article pour rédiger l’annonce par IA.',
         });
         return;
       }

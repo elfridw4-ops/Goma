@@ -243,7 +243,7 @@ export function MarketLoginView({
                       onChange={(e) => setFullName(e.target.value)}
                       aria-invalid={Boolean(errors.fullName)}
                       aria-describedby={errors.fullName ? 'login-fullname-error' : undefined}
-                      placeholder="Ex. : Amina Tossou"
+                      placeholder="Amina Tossou"
                       className="w-full rounded-xl border border-[#E7E2D9] bg-white pl-10 pr-3.5 py-3 text-base sm:text-sm text-[#201F1C] placeholder:text-[#78716C] focus:border-[#8A5A36]"
                     />
                   </div>
@@ -372,9 +372,8 @@ export function MarketLoginView({
 
               {forgotNotice && (
                 <p className="rounded-xl border border-[#E7E2D9] bg-[#F5F3EF] px-3.5 py-2.5 font-body text-xs text-[#44403C]">
-                  La réinitialisation par SMS sera activée dès le raccordement du
-                  service d’authentification. Vous pouvez créer un accès ou
-                  continuer avec Google.
+                  La réinitialisation par SMS arrive bientôt. Connectez-vous avec
+                  Google ou créez un nouvel accès avec votre numéro.
                 </p>
               )}
 
@@ -407,7 +406,7 @@ export function MarketLoginView({
                 onClick={onContinueWithoutAccount}
                 className="font-display text-xs font-semibold text-[#44403C] underline underline-offset-4 hover:text-[#201F1C] cursor-pointer"
               >
-                Continuer sans compte (sauvegarde locale)
+                Parcourir sans compte
               </button>
             </div>
           </div>

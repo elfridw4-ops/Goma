@@ -3,10 +3,12 @@ import {
   Heart,
   LogOut,
   Package,
+  Smartphone,
   Sparkles,
   Store,
   User,
 } from 'lucide-react';
+import { PWAInstallButton } from '../pwa/PWAInstallButton';
 import { AUTH_LOOKBOOK_IMAGE } from '../../data/catalog';
 import type {
   OrderConfirmation,
@@ -70,7 +72,7 @@ export function MarketAccountView({
           <button
             type="button"
             onClick={onSignOut}
-            className="inline-flex items-center gap-2 rounded-[10px] border border-[#F2E9DA]/25 bg-[#FDFCFB]/10 backdrop-blur-xs px-4 py-2.5 text-xs font-display font-semibold text-[#FDFCFB] hover:bg-[#991B1B] hover:border-[#991B1B] transition-colors self-start sm:self-center cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-[10px] border border-[#F2E9DA]/30 bg-[#FDFCFB]/12 px-4 py-2.5 text-xs font-display font-semibold text-[#FDFCFB] hover:bg-[#991B1B] hover:border-[#991B1B] transition-colors self-start sm:self-center cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
             <span>Se déconnecter</span>
@@ -92,8 +94,13 @@ export function MarketAccountView({
                 Espace Client &amp; Vendeur
               </h1>
               <p className="font-body text-sm text-[#F2E9DA]/90 max-w-xl">
-                Connectez-vous ou créez un compte pour finaliser vos achats et
-                synchroniser vos {wishlistedProducts.length} favori(s) locaux.
+                {wishlistedProducts.length > 0
+                  ? `Connectez-vous ou créez un compte pour finaliser vos commandes et retrouver vos ${wishlistedProducts.length} ${
+                      wishlistedProducts.length > 1
+                        ? 'favoris locaux'
+                        : 'favori local'
+                    } sur tous vos appareils.`
+                  : 'Connectez-vous ou créez un compte pour finaliser vos commandes et retrouver vos favoris sur tous vos appareils.'}
               </p>
             </div>
           </div>
@@ -140,9 +147,28 @@ export function MarketAccountView({
             Mettre en vente une pièce
           </p>
           <p className="font-body text-xs text-[#44403C]">
-            Publier en Neuf ou Friperie avec rédaction SEO &amp; GEO assistée.
+            Publier en Neuf ou Friperie avec rédaction d’annonce assistée par IA.
           </p>
         </button>
+      </div>
+
+      {/* PWA Mobile Installation Section */}
+      <div className="rounded-2xl border border-[#E7E2D9] bg-white p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-1.5 text-xs font-display font-semibold text-[#8A5A36]">
+            <Smartphone className="w-4 h-4 text-[#C08A2E]" aria-hidden="true" />
+            <span>Application mobile Goma</span>
+          </div>
+          <p className="font-display text-base font-bold text-[#201F1C]">
+            Installer sur votre écran d’accueil
+          </p>
+          <p className="font-body text-xs text-[#44403C]">
+            Accès instantané plein écran, catalogue fluide et notifications de suivi au Bénin.
+          </p>
+        </div>
+        <div className="w-full sm:w-auto shrink-0">
+          <PWAInstallButton variant="account" />
+        </div>
       </div>
 
       {/* Wishlist */}

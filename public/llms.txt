@@ -1,0 +1,33 @@
+# Goma — Delano Collection · Marketplace & Vitrine Bénin
+
+> Goma (Delano Collection) est la marketplace de référence au Bénin dédiée aux vêtements et accessoires, combinant pièces d’atelier neuves, friperie triée au 1er choix (pièces uniques) et un conseiller styliste IA en FCFA.
+
+## Aperçu et Mission
+
+- **Nom du service :** Goma — Delano Collection
+- **Zone géographique :** République du Bénin (Cotonou, Abomey-Calavi, Porto-Novo, Ouidah, Parakou)
+- **Devise officielle :** Franc CFA (XOF / FCFA)
+- **Moyens de paiement :** MTN Mobile Money, Moov Money, Carte bancaire, Paiement en espèces à la livraison (Cash on Delivery)
+- **Délais de livraison :** 48 heures ouvrées sur Cotonou et Abomey-Calavi ; 72 heures vers l'intérieur du pays
+
+## Espaces de l'Application
+
+1. [Vitrine Éditoriale Delano Collection](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/) : Présentation de l'univers de la maison, storytelling textile, engagement éco-responsable et sélection de départ.
+2. [Marketplace Hub](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market) : Accès rapide aux univers Neuf & Frip, catégories phares, nouveautés et boutiques vérifiées.
+3. [Catalogue Complet](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/catalogue) : Moteur de recherche et filtres par univers (Neuf / Frip), segments (Femme, Homme, Chaussure, Enfant, Accessoires), gammes de prix en FCFA et disponibilité.
+4. [Conseiller Style & Mise en Vente IA](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/assistant) : Assistant interactif basé sur Gemini analysant en temps réel le stock réel de la marketplace pour recommander des silhouettes complètes selon le budget et la morphologie de l'acheteur, ou rédiger les annonces des vendeurs béninois.
+5. [Panier & Commande](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/cart) : Gestion des pièces avec contrainte stricte d'exemplaire unique pour la friperie, vérification instantanée de la zone de livraison et sélection du mode de règlement.
+
+## Boutiques Partenaires
+
+- **Delano Cotonou** (Haie Vive, Cotonou) : Spécialiste prêt-à-porter atelier, gabardine, lin naturel et vestes structurées.
+- **Chic Frip** (Akpakpa, Cotonou) : Sélection friperie 1er choix, robes vérifiées, denim vintage et pièces uniques dès 500 F.
+- **Atelier Calavi** (Abomey-Calavi) : Maroquinerie artisanale, mocassins patinés, mailles légères et accessoires durables.
+
+## Endpoints Techniques Publics
+
+- Spécification détaillée LLM : [/llms-full.txt](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/llms-full.txt)
+- Fichier robots : [/robots.txt](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/robots.txt)
+- Sitemap XML : [/sitemap.xml](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/sitemap.xml)
+- Web App Manifest : [/site.webmanifest](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/site.webmanifest)
+- Contact sécurité : [/.well-known/security.txt](https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/.well-known/security.txt)

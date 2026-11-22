@@ -1,0 +1,44 @@
+# Robots.txt for Goma — Delano Collection
+# https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app
+
+# AI Crawlers & Answer Engines (GEO - Generative Engine Optimization)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# General Search Engines
+User-agent: *
+Allow: /
+Allow: /public/
+Allow: /assets/
+Allow: /*.css
+Allow: /*.js
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.svg
+Allow: /*.ico
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /site.webmanifest
+Allow: /manifest.json
+
+# Private endpoints & dynamic session query params
+Disallow: /api/
+Disallow: /market/checkout
+Disallow: /market/login
+
+Sitemap: https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/sitemap.xml

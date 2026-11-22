@@ -2,10 +2,10 @@ import { ArrowUpRight } from 'lucide-react';
 import { TESTIMONIALS } from '../data/catalog';
 
 interface ProofSectionProps {
-  onEnterMarketplace: () => void;
+  onEnterShop: (shopId: string) => void;
 }
 
-export function ProofSection({ onEnterMarketplace }: ProofSectionProps) {
+export function ProofSection({ onEnterShop }: ProofSectionProps) {
   return (
     <section
       id="boutiques"
@@ -45,10 +45,10 @@ export function ProofSection({ onEnterMarketplace }: ProofSectionProps) {
                 </span>
                 <button
                   type="button"
-                  onClick={onEnterMarketplace}
+                  onClick={() => onEnterShop(item.shopId)}
                   className="inline-flex items-center gap-1 font-display text-xs font-semibold text-[#8A5A36] hover:text-[#2B211B] transition-colors cursor-pointer"
                 >
-                  <span>Voir sur la marketplace</span>
+                  <span>Voir {item.organization.split(' · ')[0]}</span>
                   <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
               </div>

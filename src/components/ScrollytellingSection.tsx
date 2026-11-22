@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import {
   motion,
   useMotionValueEvent,
+  useReducedMotion,
   useScroll,
   useTransform,
 } from 'motion/react';
@@ -12,6 +13,7 @@ import { ResilientImage } from './ResilientImage';
 export function ScrollytellingSection() {
   const containerRef = useRef<HTMLElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const shouldReduceMotion = useReducedMotion();
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -22,6 +24,7 @@ export function ScrollytellingSection() {
   const stageY = useTransform(scrollYProgress, [0, 1], [8, -8]);
 
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
+    if (shouldReduceMotion) return;
     if (latest < 0.36) {
       setActiveIndex(0);
     } else if (latest < 0.72) {
@@ -37,7 +40,10 @@ export function ScrollytellingSection() {
     setActiveIndex(idx);
     const el = document.getElementById(`story-chapter-${idx}`);
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.scrollIntoView({
+        behavior: shouldReduceMotion ? 'auto' : 'smooth',
+        block: 'center',
+      });
     }
   };
 
@@ -50,9 +56,9 @@ export function ScrollytellingSection() {
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
         <div className="max-w-xl mb-14 lg:mb-20">
           <p className="text-xs font-display font-semibold tracking-[0.06em] text-[#8A5A36] mb-2">
-            L’Expérience Goma
+            L’Expérience <span translate="no">Goma</span>
           </p>
-          <h2 className="font-display text-[clamp(1.75rem,3vw,2.4rem)] font-bold leading-[1.12] tracking-[-0.015em] text-[#201F1C] [text-wrap:balance]">
+          <h2 className="font-display text-[clamp(1.75rem,3vw,2.4rem)] font-bold leading-[1.12] text-[#201F1C] [text-wrap:balance]">
             Acheter et vendre avec la même simplicité.
           </h2>
         </div>
@@ -65,20 +71,24 @@ export function ScrollytellingSection() {
                 className="w-[2px] bg-[#E7E2D9] shrink-0 overflow-hidden"
               >
                 <motion.div
-                  style={{ scaleY: railScaleY, transformOrigin: 'top' }}
+                  style={
+                    shouldReduceMotion
+                      ? { scaleY: 1, transformOrigin: 'top' }
+                      : { scaleY: railScaleY, transformOrigin: 'top' }
+                  }
                   className="w-full h-full bg-[#C08A2E]"
                 />
               </div>
 
               <motion.div
-                style={{ y: stageY }}
+                style={shouldReduceMotion ? undefined : { y: stageY }}
                 className="flex-1 min-w-0 space-y-6"
               >
                 <div className="flex items-center justify-between gap-4">
                   <div
                     className="flex items-center gap-4"
                     role="tablist"
-                    aria-label="Étapes du parcours éditorial"
+                    aria-label="Étapes du parcours client"
                   >
                     {STORY_CHAPTERS.map((chapter, idx) => {
                       const isActive = idx === activeIndex;
@@ -164,7 +174,8 @@ export function ScrollytellingSection() {
                         Cotonou · Calavi · Porto-Novo
                       </p>
                       <span className="font-mono-tabular text-xs text-[#8A5A36]">
-                        MTN / Moov / À la livraison
+                        <span translate="no">MTN</span> /{' '}
+                        <span translate="no">Moov</span> / À la livraison
                       </span>
                     </div>
                   </div>
@@ -175,12 +186,12 @@ export function ScrollytellingSection() {
 
           <div className="lg:col-span-7 space-y-16 lg:space-y-24">
             {STORY_CHAPTERS.map((chapter, idx) => {
-              const isCurrent = idx === activeIndex;
+              const isCurrent = shouldReduceMotion || idx === activeIndex;
               return (
                 <article
                   id={`story-chapter-${idx}`}
                   key={chapter.index}
-                  className={`border-t border-[#E7E2D9] pt-8 transition-opacity duration-300 ${
+                  className={`scrolly-chapter border-t border-[#E7E2D9] pt-8 transition-opacity duration-300 ${
                     isCurrent ? 'opacity-100' : 'opacity-65'
                   }`}
                 >

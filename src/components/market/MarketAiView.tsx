@@ -152,7 +152,7 @@ export function MarketAiView({
   const handleGenerateSeo = async () => {
     if (draft.name.trim().length < 2) {
       setSellerAiError(
-        'Indiquez d’abord le nom de l’article pour générer sa fiche SEO & GEO.',
+        'Indiquez d’abord le nom de l’article pour rédiger l’annonce par IA.',
       );
       focusFirstInvalidField([{ id: 'seller-name', hasError: true }]);
       return;
@@ -184,7 +184,7 @@ export function MarketAiView({
 
       if (!response.ok) {
         setSellerAiError(
-          data.error || 'Impossible de générer la fiche SEO & GEO par IA.',
+          data.error || 'Impossible de rédiger l’annonce par IA pour le moment.',
         );
         return;
       }
@@ -201,7 +201,7 @@ export function MarketAiView({
       }));
     } catch (err) {
       if ((err as Error).name === 'AbortError') return;
-      setSellerAiError('Erreur réseau lors de la génération SEO & GEO.');
+      setSellerAiError('Connexion indisponible. Vérifiez votre réseau et réessayez.');
     } finally {
       if (sellerAbortRef.current === controller) {
         setSellerAiLoading(false);
@@ -298,7 +298,7 @@ export function MarketAiView({
                 : 'font-medium text-[#78716C] hover:text-[#201F1C]'
             }`}
           >
-            <span>Espace Vendeur &amp; SEO</span>
+            <span>Vendre une pièce</span>
             {activeTab === 'seller' && (
               <span
                 aria-hidden="true"
@@ -328,7 +328,7 @@ export function MarketAiView({
                 onChange={(e) => setBuyerQuery(e.target.value)}
                 aria-invalid={Boolean(buyerError)}
                 aria-describedby={buyerError ? 'buyer-ai-error' : undefined}
-                placeholder="Ex. : Une tenue légère pour Cotonou sous 20 000 F…"
+                placeholder="Une tenue légère pour Cotonou sous 20 000 F…"
                 className="flex-1 rounded-[10px] border border-[#E7E2D9] bg-white px-4 py-3 text-base sm:text-sm text-[#201F1C] placeholder:text-[#78716C] focus:border-[#8A5A36]"
               />
               <button
@@ -439,7 +439,7 @@ export function MarketAiView({
                 onChange={(e) => setDraft({ ...draft, name: e.target.value })}
                 aria-invalid={Boolean(draftErrors.name)}
                 aria-describedby={draftErrors.name ? 'seller-name-error' : undefined}
-                placeholder="Ex. : Robe Lin Naturel ou Jean Vintage"
+                placeholder="Robe lin naturel ou jean coupe droite"
                 className="w-full rounded-[10px] border border-[#E7E2D9] bg-white px-3.5 py-2.5 text-base sm:text-sm text-[#201F1C]"
               />
               {draftErrors.name && (
@@ -651,8 +651,8 @@ export function MarketAiView({
                 )}
                 <span>
                   {sellerAiLoading
-                    ? 'Génération en cours…'
-                    : 'Rédiger avec l’IA SEO & GEO'}
+                    ? 'Rédaction en cours…'
+                    : 'Rédiger l’annonce par IA'}
                 </span>
               </button>
             </div>
@@ -699,7 +699,7 @@ export function MarketAiView({
 
           {sellerAiPreview && (
             <p className="font-body text-xs text-[#7A5B45]">
-              Indexation GEO : {sellerAiPreview.geoSummary} ·{' '}
+              Visibilité locale : {sellerAiPreview.geoSummary} ·{' '}
               {sellerAiPreview.keywords.join(', ')}
             </p>
           )}

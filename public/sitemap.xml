@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Vitrine Éditoriale -->
+  <url>
+    <loc>https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Marketplace Hub -->
+  <url>
+    <loc>https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Catalogue complet Neuf & Frip -->
+  <url>
+    <loc>https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/catalogue</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Conseiller Style & Vente IA -->
+  <url>
+    <loc>https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/assistant</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Panier & Livraison -->
+  <url>
+    <loc>https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/cart</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Boutiques partenaires au Bénin -->
+  <url>
+    <loc>https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/shop/shop-delano-cotonou</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/shop/shop-chic-frip</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/shop/shop-atelier-calavi</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Produits phares du catalogue -->
+  <url>
+    <loc>https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/product/robe-taille-m</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/product/veste-gabardine-moutarde</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/product/mocassins-patines-argile</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/product/pull-col-cheminee-argile</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/product/pantalon-tailleur-lin-naturel</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/product/jean-coupe-droite-vintage</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/product/chemisier-soie-sable</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ais-pre-inbnbzhrjleozlgpnhvznl-163673602338.europe-west1.run.app/market/product/cabas-cuir-patine-artisan</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>

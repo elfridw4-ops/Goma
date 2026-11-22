@@ -43,6 +43,7 @@ import { MarketCartView } from './components/market/MarketCartView';
 import { MarketLoginView } from './components/market/MarketLoginView';
 import { MarketAccountView } from './components/market/MarketAccountView';
 import { MarketAiView } from './components/market/MarketAiView';
+import { OfflineIndicator } from './components/pwa/OfflineIndicator';
 
 function parsePathToRoute(pathname: string): AppRoute {
   if (pathname === '/' || pathname === '') {
@@ -286,7 +287,7 @@ export default function App() {
       case 'market-assistant':
         nextTitle =
           aiTab === 'seller'
-            ? 'Espace Vendeur & SEO — Marketplace Goma'
+            ? 'Vendre une pièce — Marketplace Goma'
             : 'Conseiller Acheteur IA — Marketplace Goma';
         break;
     }
@@ -510,7 +511,13 @@ export default function App() {
           />
           <VitrineUniversSection onEnterMarketplace={handleEnterMarketplace} />
           <ScrollytellingSection />
-          <ProofSection onEnterMarketplace={handleEnterMarketplace} />
+          <ProofSection
+            onEnterShop={(shopId) => {
+              setSelectedSegment('Tous');
+              setSearchQuery('');
+              navigate({ view: 'market-catalogue', shopId });
+            }}
+          />
         </main>
 
         <ConversionFooter onEnterMarketplace={handleEnterMarketplace} />
@@ -799,6 +806,9 @@ export default function App() {
         />
       )}
       </div>
+
+      {/* Non-intrusive offline connectivity status */}
+      <OfflineIndicator />
 
       {/* Toast notification (cart addition, local favorite save, account sync) */}
       {toast && (

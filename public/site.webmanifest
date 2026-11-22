@@ -1,0 +1,57 @@
+{
+  "id": "/",
+  "name": "Goma — Delano Collection",
+  "short_name": "Goma",
+  "description": "Marketplace de vêtements et accessoires au Bénin : pièces neuves d’atelier, friperie 1er choix et conseiller IA en FCFA.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FDFCFB",
+  "theme_color": "#2B211B",
+  "lang": "fr",
+  "orientation": "portrait-primary",
+  "categories": ["shopping", "lifestyle"],
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Catalogue",
+      "short_name": "Catalogue",
+      "description": "Parcourir les pièces neuves et friperie",
+      "url": "/market/catalogue",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Conseiller IA",
+      "short_name": "IA Style",
+      "description": "Conseiller style et mise en vente IA",
+      "url": "/market/assistant",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Panier",
+      "short_name": "Panier",
+      "description": "Consulter vos articles et commander",
+      "url": "/market/cart",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}
