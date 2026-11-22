@@ -298,7 +298,7 @@ export function MarketHomeView({
             Besoin d’un conseil style ou de publier un article ?
           </h2>
           <p className="font-body text-sm text-[#44403C] max-w-xl">
-            Notre conseiller vous aide à choisir selon votre budget en FCFA et
+            Notre conseiller vous aide à choisir selon votre budget et
             rédige vos fiches vendeur en moins d’une minute.
           </p>
 

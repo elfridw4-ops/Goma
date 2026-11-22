@@ -290,7 +290,7 @@ export function ScrollytellingSection() {
                     </div>
                     <div className="rounded-xl bg-[#201F1C]/90 text-[#FDFCFB] p-4 shadow-layer-md backdrop-blur-md">
                       <p className="font-body text-sm text-[#F2E9DA]">
-                        L’assistant IA intégré à la marketplace conseille selon votre budget en FCFA et le stock disponible.
+                        L’assistant IA intégré à la marketplace conseille selon votre budget et le stock disponible.
                       </p>
                     </div>
                   </div>

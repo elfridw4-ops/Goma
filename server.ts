@@ -77,7 +77,7 @@ async function startServer() {
           contents: `Demande client au Bénin : "${query.trim()}"\n\nCatalogue marketplace Goma (Neuf & Frip en FCFA) :\n${catalogSummary}`,
           config: {
             systemInstruction:
-              'Tu es le conseiller styliste personnel de la marketplace Goma (Delano Collection & boutiques partenaires au Bénin : Cotonou, Abomey-Calavi, Porto-Novo). Réponds en français sobre, précis et utile. Recommande 1 à 3 articles en stock (Stock > 0) du catalogue fourni en utilisant leurs identifiants exacts et les prix en FCFA.',
+              'Tu es le conseiller styliste personnel de la marketplace Goma (Delano Collection & boutiques partenaires au Bénin). Réponds en français sobre, précis et utile. Recommande 1 à 3 articles en stock (Stock > 0) du catalogue fourni en utilisant leurs identifiants exacts et les prix en FCFA.',
             responseMimeType: 'application/json',
             responseSchema: {
               type: Type.OBJECT,
@@ -96,7 +96,7 @@ async function startServer() {
                 stylingNotes: {
                   type: Type.STRING,
                   description:
-                    'Note pratique d’association des couleurs Argile & Moutarde ou de livraison locale.',
+                    'Note pratique d’association des couleurs ou de livraison locale.',
                 },
               },
               required: ['advice', 'recommendedIds', 'stylingNotes'],

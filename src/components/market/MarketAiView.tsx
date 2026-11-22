@@ -100,7 +100,7 @@ export function MarketAiView({
     e.preventDefault();
     const promptToSend = (overrideQuery ?? buyerQuery).trim();
     if (promptToSend.length < 2) {
-      setBuyerError('Décrivez votre besoin de tenue, taille ou budget en FCFA.');
+      setBuyerError('Décrivez votre besoin de tenue, taille ou budget.');
       focusFirstInvalidField([
         { id: 'market-buyer-ai-input', hasError: true },
       ]);

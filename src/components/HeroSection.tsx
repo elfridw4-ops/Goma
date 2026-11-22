@@ -78,8 +78,7 @@ export function HeroSection({
 
           <p className="font-body text-base sm:text-lg leading-[1.65] text-[#F2E9DA] max-w-[60ch] mb-8">
             Pièces neuves d’atelier, friperie triée au premier choix et conseil IA
-            sur votre taille et votre budget en FCFA — livrés en 48 h à Cotonou et
-            Abomey-Calavi.
+            sur votre taille et votre budget — livrés en 48 h.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-10 sm:mb-12">
