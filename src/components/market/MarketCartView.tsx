@@ -22,6 +22,7 @@ import {
   formatPriceFcfa,
   validateCheckoutForm,
 } from '../../utils/marketplaceLogic';
+import { soundFx } from '../../utils/soundService';
 import {
   focusFirstInvalidField,
   useModalAccessibility,
@@ -64,6 +65,7 @@ export function MarketCartView({
   const authCloseBtnRef = useRef<HTMLButtonElement>(null);
 
   const closeAuthModal = useCallback(() => {
+    soundFx.playClick();
     setAuthModalOpen(false);
   }, []);
 
@@ -83,6 +85,7 @@ export function MarketCartView({
   const totals = calculateCartTotals(cart, form.city);
 
   const handleCheckoutTrigger = () => {
+    soundFx.playClick();
     if (!session) {
       setAuthModalOpen(true);
       return;
@@ -99,6 +102,7 @@ export function MarketCartView({
     e.preventDefault();
     const validationErrors = validateCheckoutForm(form);
     if (Object.keys(validationErrors).length > 0) {
+      soundFx.playError();
       setErrors(validationErrors);
       focusFirstInvalidField([
         { id: 'co-name', hasError: Boolean(validationErrors.fullName) },
@@ -108,6 +112,7 @@ export function MarketCartView({
       ]);
       return;
     }
+    soundFx.playSuccess();
     setErrors({});
     onCompleteOrder(form);
     setCheckoutOpen(false);
@@ -243,9 +248,10 @@ export function MarketCartView({
                   <div className="flex items-center justify-between gap-2 pt-1">
                     <button
                       type="button"
-                      onClick={() =>
-                        onRemoveItem(item.productId, item.selectedSize)
-                      }
+                      onClick={() => {
+                        soundFx.playClick();
+                        onRemoveItem(item.productId, item.selectedSize);
+                      }}
                       aria-label={`Retirer ${item.name} du panier`}
                       className="inline-flex items-center gap-1 text-xs font-body text-[#78716C] hover:text-[#991B1B] underline underline-offset-2 cursor-pointer"
                     >
@@ -261,9 +267,10 @@ export function MarketCartView({
                       <div className="inline-flex items-center gap-1.5 rounded-lg border border-[#E7E2D9] bg-[#F5F3EF] px-1.5 py-1">
                         <button
                           type="button"
-                          onClick={() =>
-                            onUpdateQuantity(item.productId, item.selectedSize, -1)
-                          }
+                          onClick={() => {
+                            soundFx.playClick();
+                            onUpdateQuantity(item.productId, item.selectedSize, -1);
+                          }}
                           aria-label={`Diminuer la quantité de ${item.name}`}
                           className="w-8 h-8 rounded flex items-center justify-center hover:bg-white active:scale-[0.95] transition-transform cursor-pointer"
                         >
@@ -274,9 +281,10 @@ export function MarketCartView({
                         </span>
                         <button
                           type="button"
-                          onClick={() =>
-                            onUpdateQuantity(item.productId, item.selectedSize, 1)
-                          }
+                          onClick={() => {
+                            soundFx.playClick();
+                            onUpdateQuantity(item.productId, item.selectedSize, 1);
+                          }}
                           disabled={item.quantity >= item.maxStock}
                           aria-label={`Augmenter la quantité de ${item.name}`}
                           className="w-8 h-8 rounded flex items-center justify-center hover:bg-white disabled:opacity-40 active:scale-[0.95] transition-transform cursor-pointer"

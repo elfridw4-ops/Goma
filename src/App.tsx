@@ -32,8 +32,8 @@ import { VitrineHeader } from './components/vitrine/VitrineHeader';
 import { HeroSection } from './components/HeroSection';
 import { VitrineUniversSection } from './components/vitrine/VitrineUniversSection';
 import { ScrollytellingSection } from './components/ScrollytellingSection';
-import { ProofSection } from './components/ProofSection';
 import { ConversionFooter } from './components/ConversionFooter';
+import { soundFx } from './utils/soundService';
 import { MarketHeader } from './components/market/MarketHeader';
 import { MarketBottomNav } from './components/market/MarketBottomNav';
 import { MarketHomeView } from './components/market/MarketHomeView';
@@ -307,6 +307,7 @@ export default function App() {
   }, [toast, toastPaused]);
 
   const navigate = (nextRoute: AppRoute) => {
+    soundFx.playClick();
     const basePath = routeToPath(nextRoute);
     let targetUrl = basePath;
     if (nextRoute.view === 'market-catalogue') {
@@ -375,6 +376,7 @@ export default function App() {
   );
 
   const handleAddToCart = (product: Product, size: string) => {
+    soundFx.playSuccess();
     setLastOrder(null);
     setCart((prev) => addToCart(prev, product, size));
     showToast({
@@ -385,12 +387,14 @@ export default function App() {
   };
 
   const handleBuyNow = (product: Product, size: string) => {
+    soundFx.playSuccess();
     setLastOrder(null);
     setCart((prev) => addToCart(prev, product, size));
     navigate({ view: 'market-cart' });
   };
 
   const handleToggleWishlist = (productId: string) => {
+    soundFx.playSuccess();
     if (session) {
       const { nextList, added } = toggleWishlistItem(accountWishlist, productId);
       setAccountWishlist(nextList);
@@ -416,6 +420,7 @@ export default function App() {
   };
 
   const finalizeAuthAndSync = (user: UserSession, redirectTo?: AppRoute['view']) => {
+    soundFx.playSuccess();
     const { accountIds, syncedCount } =
       marketplaceRepository.syncGuestWishlistToAccount(user);
     setSession(user);
@@ -465,6 +470,7 @@ export default function App() {
   };
 
   const handlePublishProduct = (draft: SellerDraft): Product => {
+    soundFx.playSuccess();
     const created = createProductFromDraft(
       draft,
       customProducts.length + 1,
@@ -511,13 +517,6 @@ export default function App() {
           />
           <VitrineUniversSection onEnterMarketplace={handleEnterMarketplace} />
           <ScrollytellingSection />
-          <ProofSection
-            onEnterShop={(shopId) => {
-              setSelectedSegment('Tous');
-              setSearchQuery('');
-              navigate({ view: 'market-catalogue', shopId });
-            }}
-          />
         </main>
 
         <ConversionFooter onEnterMarketplace={handleEnterMarketplace} />
