@@ -116,19 +116,18 @@ export function ScrollytellingSection() {
                 </div>
 
                 {activeIndex === 0 && (
-                  <div data-testid="scrolly-stage-0" className="space-y-4">
-                    <div className="aspect-[4/3] rounded-xl overflow-hidden bg-[#E7E2D9] shadow-layer-md">
-                      <ResilientImage
-                        src={INITIAL_PRODUCTS[0].images[0]}
-                        alt={INITIAL_PRODUCTS[0].name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex items-baseline justify-between gap-4 pt-1">
-                      <p className="font-display text-sm font-semibold text-[#201F1C]">
+                  <div data-testid="scrolly-stage-0" className="relative rounded-2xl overflow-hidden bg-[#E7E2D9] shadow-layer-lg aspect-[16/13] sm:aspect-[4/5] flex flex-col justify-end">
+                    <ResilientImage
+                      src={INITIAL_PRODUCTS[0].images[0]}
+                      alt={INITIAL_PRODUCTS[0].name}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#201F1C]/90 via-[#201F1C]/25 to-transparent pointer-events-none" />
+                    <div className="relative z-10 p-5 sm:p-6 flex items-baseline justify-between gap-4 text-[#FDFCFB]">
+                      <p className="font-display text-sm sm:text-base font-bold">
                         Sélection Frip &amp; Neuf · Cotonou
                       </p>
-                      <span className="font-mono-tabular text-xs text-[#8A5A36]">
+                      <span className="font-mono-tabular text-xs font-semibold text-[#D4973B] shrink-0">
                         Dès {formatPriceFcfa(INITIAL_PRODUCTS[0].priceFcfa)}
                       </span>
                     </div>
@@ -136,46 +135,49 @@ export function ScrollytellingSection() {
                 )}
 
                 {activeIndex === 1 && (
-                  <div data-testid="scrolly-stage-1" className="space-y-4">
+                  <div data-testid="scrolly-stage-1" className="space-y-3">
                     <div className="grid grid-cols-2 gap-3">
                       {INITIAL_PRODUCTS.slice(5, 7).map((item) => (
-                        <div key={item.id} className="space-y-2">
-                          <div className="aspect-[4/3] rounded-xl overflow-hidden bg-[#E7E2D9] shadow-layer-md">
-                            <ResilientImage
-                              src={item.images[0]}
-                              alt={item.name}
-                              className="w-full h-full object-cover"
-                            />
+                        <div key={item.id} className="relative rounded-xl overflow-hidden bg-[#E7E2D9] shadow-layer-md aspect-[4/5] flex flex-col justify-end">
+                          <ResilientImage
+                            src={item.images[0]}
+                            alt={item.name}
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#201F1C]/85 via-transparent to-transparent pointer-events-none" />
+                          <div className="relative z-10 p-3 text-[#FDFCFB]">
+                            <p className="font-display text-xs font-bold truncate">
+                              {item.name}
+                            </p>
+                            <span className="font-mono-tabular text-[11px] text-[#D4973B]">
+                              {formatPriceFcfa(item.priceFcfa)}
+                            </span>
                           </div>
-                          <p className="font-display text-xs font-semibold text-[#201F1C] truncate">
-                            {item.name}
-                          </p>
                         </div>
                       ))}
                     </div>
-                    <p className="font-body text-sm text-[#44403C] max-w-[65ch]">
-                      L’assistant IA intégré à la marketplace conseille selon
-                      votre budget en FCFA et le stock disponible.
-                    </p>
+                    <div className="rounded-xl bg-[#201F1C]/90 text-[#FDFCFB] p-4 shadow-layer-md backdrop-blur-md">
+                      <p className="font-body text-xs sm:text-sm text-[#F2E9DA]">
+                        L’assistant IA intégré à la marketplace conseille selon votre budget en FCFA et le stock disponible.
+                      </p>
+                    </div>
                   </div>
                 )}
 
                 {activeIndex === 2 && (
-                  <div data-testid="scrolly-stage-2" className="space-y-4">
-                    <div className="aspect-[4/3] rounded-xl overflow-hidden bg-[#E7E2D9] shadow-layer-md">
-                      <ResilientImage
-                        src={INITIAL_PRODUCTS[7].images[0]}
-                        alt={INITIAL_PRODUCTS[7].name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex items-baseline justify-between gap-4 pt-1">
-                      <p className="font-display text-sm font-semibold text-[#201F1C]">
+                  <div data-testid="scrolly-stage-2" className="relative rounded-2xl overflow-hidden bg-[#E7E2D9] shadow-layer-lg aspect-[16/13] sm:aspect-[4/5] flex flex-col justify-end">
+                    <ResilientImage
+                      src={INITIAL_PRODUCTS[7].images[0]}
+                      alt={INITIAL_PRODUCTS[7].name}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#201F1C]/90 via-[#201F1C]/25 to-transparent pointer-events-none" />
+                    <div className="relative z-10 p-5 sm:p-6 flex items-baseline justify-between gap-4 text-[#FDFCFB]">
+                      <p className="font-display text-sm sm:text-base font-bold">
                         Cotonou · Calavi · Porto-Novo
                       </p>
-                      <span className="font-mono-tabular text-xs text-[#8A5A36]">
-                        <span translate="no">MTN</span> /{' '}
-                        <span translate="no">Moov</span> / À la livraison
+                      <span className="font-mono-tabular text-xs font-semibold text-[#D4973B] shrink-0">
+                        <span translate="no">MTN</span> / <span translate="no">Moov</span> / Cash
                       </span>
                     </div>
                   </div>

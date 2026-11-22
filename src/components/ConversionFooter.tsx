@@ -60,22 +60,6 @@ export function ConversionFooter({ onEnterMarketplace }: ConversionFooterProps) 
             <a href="#boutiques" className="hover:text-[#FDFCFB] transition-colors">
               Maisons
             </a>
-            <a
-              href="/llms.txt"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#D4973B] hover:text-[#FDFCFB] transition-colors"
-            >
-              llms.txt
-            </a>
-            <a
-              href="/sitemap.xml"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[#FDFCFB] transition-colors"
-            >
-              Sitemap
-            </a>
             <span className="font-mono-tabular text-[#D4973B]">Français · FCFA</span>
           </div>
         </div>
