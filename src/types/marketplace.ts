@@ -15,6 +15,8 @@ export type MarketSegment =
   | 'Homme'
   | 'Femme'
   | 'Chaussure'
+  | 'Sacs'
+  | 'Bijoux'
   | 'Enfant'
   | 'Accessoires';
 

@@ -23,12 +23,12 @@ import {
   calculateCartTotals,
   createProductFromDraft,
   filterAndSortProducts,
-  formatPriceFcfa,
   parseUrlSearchState,
   removeFromCart,
   toggleWishlistItem,
   updateCartQuantity,
 } from './utils/marketplaceLogic';
+import { resolveOgMeta } from './utils/ogMeta';
 import { VitrineHeader } from './components/vitrine/VitrineHeader';
 import { HeroSection } from './components/HeroSection';
 import { VitrineUniversSection } from './components/vitrine/VitrineUniversSection';
@@ -257,60 +257,13 @@ export default function App() {
 
   // Dynamic metadata & OpenGraph / Twitter preview tags updater for sharing
   useEffect(() => {
-    const origin = window.location.origin;
-    let nextTitle = 'Goma — Delano Collection | Marketplace & Assistance IA';
-    let nextDescription = 'DELANO COLLECTION, votre référence en vêtements et accessoires sur la marketplace Goma avec assistance IA personnalisée au Bénin.';
-    let imageUrl = `${origin}/og-image.png`;
+    const meta = resolveOgMeta({
+      requestPath: window.location.pathname + window.location.search,
+      baseUrl: window.location.origin,
+      products,
+    });
 
-    switch (route.view) {
-      case 'vitrine':
-        nextTitle = 'Goma — Delano Collection · Vitrine éditoriale';
-        nextDescription = 'Découvrez l’univers de la maison Goma, ses collections exclusives Delano Collection et la marketplace au Bénin.';
-        imageUrl = `${origin}/og-image.png`;
-        break;
-      case 'market-home':
-        nextTitle = `Marketplace Goma (${condition === 'frip' ? 'Friperie' : 'Neuf'}) · Delano Collection`;
-        nextDescription = 'Achetez et vendez des vêtements neufs et friperie 1er choix au Bénin avec paiement Mobile Money.';
-        imageUrl = `${origin}/og-image.png`;
-        break;
-      case 'market-catalogue':
-        nextTitle =
-          selectedSegment !== 'Tous'
-            ? `Catalogue ${selectedSegment} — Marketplace Goma`
-            : 'Catalogue complet — Marketplace Goma';
-        nextDescription = 'Parcourez notre sélection rigoureuse de pièces neuves et de friperie validées par nos boutiques partenaires à Cotonou et Calavi.';
-        imageUrl = `${origin}/og-image.png`;
-        break;
-      case 'market-product': {
-        const prod = products.find((p) => p.id === route.productId);
-        if (prod) {
-          nextTitle = `${prod.name} — ${formatPriceFcfa(prod.priceFcfa)} | Goma`;
-          nextDescription = `${prod.description} · ${prod.material} · Tailles: ${prod.sizes.join(', ')} · Livraison Bénin.`;
-          if (prod.images && prod.images.length > 0) {
-            imageUrl = prod.images[0].startsWith('http') ? prod.images[0] : `${origin}${prod.images[0]}`;
-          }
-        }
-        break;
-      }
-      case 'market-cart':
-        nextTitle = 'Votre panier — Marketplace Goma';
-        break;
-      case 'market-login':
-        nextTitle = 'Connexion — Marketplace Goma';
-        break;
-      case 'market-account':
-        nextTitle = 'Mon compte & favoris — Marketplace Goma';
-        break;
-      case 'market-assistant':
-        nextTitle =
-          aiTab === 'seller'
-            ? 'Vendre une pièce — Marketplace Goma'
-            : 'Conseiller Acheteur IA — Marketplace Goma';
-        nextDescription = 'Discutez avec l’assistant IA Goma pour trouver la silhouette parfaite ou mettre en ligne votre pièce en 2 minutes.';
-        break;
-    }
-
-    document.title = nextTitle;
+    document.title = meta.title;
 
     const setMeta = (propertyAttr: string, attrName: string, value: string) => {
       let el = document.querySelector(`meta[${propertyAttr}="${attrName}"]`);
@@ -322,16 +275,21 @@ export default function App() {
       el.setAttribute('content', value);
     };
 
-    setMeta('property', 'og:title', nextTitle);
-    setMeta('property', 'og:description', nextDescription);
-    setMeta('property', 'og:image', imageUrl);
-    setMeta('property', 'og:image:secure_url', imageUrl);
+    setMeta('property', 'og:type', meta.ogType);
+    setMeta('property', 'og:title', meta.title);
+    setMeta('property', 'og:description', meta.description);
+    setMeta('property', 'og:image', meta.imageUrl);
+    setMeta('property', 'og:image:secure_url', meta.imageUrl);
+    setMeta('property', 'og:image:type', meta.imageType);
+    setMeta('property', 'og:image:width', meta.imageWidth);
+    setMeta('property', 'og:image:height', meta.imageHeight);
+    setMeta('property', 'og:image:alt', meta.imageAlt);
     setMeta('property', 'og:url', window.location.href);
 
-    setMeta('name', 'twitter:title', nextTitle);
-    setMeta('name', 'twitter:description', nextDescription);
-    setMeta('name', 'twitter:image', imageUrl);
-    setMeta('name', 'description', nextDescription);
+    setMeta('name', 'twitter:title', meta.title);
+    setMeta('name', 'twitter:description', meta.description);
+    setMeta('name', 'twitter:image', meta.imageUrl);
+    setMeta('name', 'description', meta.description);
 
     let canon = document.querySelector('link[rel="canonical"]');
     if (!canon) {

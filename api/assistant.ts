@@ -92,7 +92,7 @@ export default async function handler(
 
       const catalogSummary = Array.isArray(catalog)
         ? (catalog as CatalogSummaryItem[])
-            .slice(0, 14)
+            .slice(0, 40)
             .map(
               (item) =>
                 `- [${item.id}] ${item.name} (${item.condition === 'frip' ? 'Friperie' : 'Neuf'} · ${item.segment}) | ${item.priceFcfa} F | ${item.material} | Tailles: ${(item.sizes || []).join(', ')} | Ville: ${item.geoCity} | Stock: ${item.stockCount}`,

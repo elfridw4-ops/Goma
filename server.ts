@@ -1,9 +1,11 @@
 import 'dotenv/config';
 import express from 'express';
 import fs from 'node:fs';
+import { createServer } from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GoogleGenAI, Type } from '@google/genai';
+import { injectOgIntoHtml, normalizeBaseUrl, resolveOgMeta } from './src/utils/ogMeta';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,7 +29,14 @@ function getAiClient(): GoogleGenAI | null {
 
 async function startServer() {
   const app = express();
+  app.set('trust proxy', true);
   app.use(express.json({ limit: '10mb' }));
+
+  const getBaseUrl = (req: express.Request) =>
+    normalizeBaseUrl(
+      req.headers['x-forwarded-proto'] ?? req.protocol,
+      req.headers['x-forwarded-host'] ?? req.get('host'),
+    );
 
   app.get('/api/health', (_req, res) => {
     res.json({ ok: true, service: 'goma-delano-collection' });
@@ -54,7 +63,7 @@ async function startServer() {
 
         const catalogSummary = Array.isArray(catalog)
           ? catalog
-              .slice(0, 14)
+              .slice(0, 40)
               .map(
                 (item: {
                   id: string;
@@ -197,7 +206,7 @@ async function startServer() {
     const filePath = path.join(publicPath, 'sitemap.xml');
     if (fs.existsSync(filePath)) {
       let content = fs.readFileSync(filePath, 'utf-8');
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const baseUrl = getBaseUrl(req);
       content = content.replace(/https:\/\/[^\s<>"]+/g, (match) => {
         if (match.includes('sitemaps.org') || match.includes('schema.org')) return match;
         return baseUrl;
@@ -213,7 +222,7 @@ async function startServer() {
     const filePath = path.join(publicPath, 'robots.txt');
     if (fs.existsSync(filePath)) {
       let content = fs.readFileSync(filePath, 'utf-8');
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const baseUrl = getBaseUrl(req);
       content = content.replace(/https:\/\/[^\s<>"]+/g, (match) => {
         if (match.includes('sitemaps.org') || match.includes('schema.org')) return match;
         return baseUrl;
@@ -229,7 +238,7 @@ async function startServer() {
     const filePath = path.join(publicPath, 'llms.txt');
     if (fs.existsSync(filePath)) {
       let content = fs.readFileSync(filePath, 'utf-8');
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const baseUrl = getBaseUrl(req);
       content = content.replace(/https:\/\/[^\s<>"]+/g, (match) => {
         if (match.includes('schema.org')) return match;
         return baseUrl;
@@ -245,7 +254,7 @@ async function startServer() {
     const filePath = path.join(publicPath, 'llms-full.txt');
     if (fs.existsSync(filePath)) {
       let content = fs.readFileSync(filePath, 'utf-8');
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const baseUrl = getBaseUrl(req);
       content = content.replace(/https:\/\/[^\s<>"]+/g, (match) => {
         if (match.includes('schema.org')) return match;
         return baseUrl;
@@ -259,22 +268,96 @@ async function startServer() {
 
   app.use(express.static(publicPath));
 
+  const httpServer = createServer(app);
+  const disableHmr = process.env.DISABLE_HMR === 'true';
+
   if (process.env.NODE_ENV !== 'production') {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        ...(disableHmr
+          ? { hmr: false as const, ws: false as const }
+          : { ws: { server: httpServer } }),
+      },
       appType: 'spa',
     });
+
+    if (disableHmr) {
+      app.get('/@vite/client', async (_req, res, next) => {
+        try {
+          const result = await vite.transformRequest('/@vite/client');
+          if (!result) {
+            next();
+            return;
+          }
+          const patched = result.code
+            .replaceAll('await wsTransport.connect(handlers);', 'return;')
+            .replaceAll('await wsTransport.disconnect();', 'return;')
+            .replaceAll('wsTransport.send(data);', 'return;');
+          res
+            .status(200)
+            .set({
+              'Content-Type': 'application/javascript; charset=utf-8',
+              'Cache-Control': 'no-cache',
+            })
+            .end(patched);
+        } catch (err) {
+          next(err);
+        }
+      });
+    }
+
+    app.use(async (req, res, next) => {
+      if (req.method !== 'GET' && req.method !== 'HEAD') {
+        next();
+        return;
+      }
+      const reqPath = req.path || '/';
+      if (
+        reqPath.startsWith('/@') ||
+        reqPath.startsWith('/src/') ||
+        reqPath.startsWith('/node_modules/') ||
+        reqPath.startsWith('/api/') ||
+        /\.[a-z0-9]{1,16}$/i.test(reqPath)
+      ) {
+        next();
+        return;
+      }
+      const accept = req.headers.accept || '';
+      if (accept && !accept.includes('text/html') && !accept.includes('*/*')) {
+        next();
+        return;
+      }
+
+      try {
+        const indexPath = path.resolve(__dirname, 'index.html');
+        const rawTemplate = fs.readFileSync(indexPath, 'utf-8');
+        const transformed = await vite.transformIndexHtml(req.originalUrl, rawTemplate);
+        const baseUrl = getBaseUrl(req);
+        const meta = resolveOgMeta({ requestPath: req.originalUrl, baseUrl });
+        const finalHtml = injectOgIntoHtml(transformed, meta, baseUrl);
+        res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(finalHtml);
+      } catch (err) {
+        next(err);
+      }
+    });
+
     app.use(vite.middlewares);
   } else {
     const distPath = path.resolve(__dirname, 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (_req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+    app.use(express.static(distPath, { index: false }));
+    app.get('*', (req, res) => {
+      const htmlPath = path.join(distPath, 'index.html');
+      const rawHtml = fs.readFileSync(htmlPath, 'utf-8');
+      const baseUrl = getBaseUrl(req);
+      const meta = resolveOgMeta({ requestPath: req.originalUrl, baseUrl });
+      const finalHtml = injectOgIntoHtml(rawHtml, meta, baseUrl);
+      res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).send(finalHtml);
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  httpServer.listen(PORT, '0.0.0.0', () => {
     console.log(`Serveur Goma — Delano Collection démarré sur http://0.0.0.0:${PORT}`);
   });
 }

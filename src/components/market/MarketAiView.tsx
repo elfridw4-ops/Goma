@@ -53,6 +53,8 @@ const SELLER_SEGMENTS: Exclude<MarketSegment, 'Tous'>[] = [
   'Femme',
   'Homme',
   'Chaussure',
+  'Sacs',
+  'Bijoux',
   'Enfant',
   'Accessoires',
 ];

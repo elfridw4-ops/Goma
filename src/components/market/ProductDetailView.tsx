@@ -24,6 +24,8 @@ import {
   checkDeliveryByCity,
   formatPriceFcfa,
 } from '../../utils/marketplaceLogic';
+import { INITIAL_PRODUCTS } from '../../data/catalog';
+import { toAbsoluteShareImageUrl } from '../../utils/ogMeta';
 import { useModalAccessibility } from '../../utils/useModalAccessibility';
 import { soundFx } from '../../utils/soundService';
 import { PaymentMethodIcon } from '../icons/BrandIcons';
@@ -63,7 +65,13 @@ export function ProductDetailView({
   onBuyNow,
   onAskAiAboutProduct,
 }: ProductDetailViewProps) {
-  const [imageIdx, setImageIdx] = useState(0);
+  const [imageIdx, setImageIdx] = useState(() => {
+    const param = new URLSearchParams(window.location.search).get('img');
+    const parsed = param ? Number.parseInt(param, 10) : 0;
+    return Number.isFinite(parsed) && parsed >= 0 && parsed < product.images.length
+      ? parsed
+      : 0;
+  });
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] || 'Unique');
   const [selectedCity, setSelectedCity] = useState('Cotonou');
   const [deliveryCheck, setDeliveryCheck] =
@@ -79,7 +87,13 @@ export function ProductDetailView({
   useModalAccessibility(zoomOpen, closeZoom, zoomCloseBtnRef);
 
   useEffect(() => {
-    setImageIdx(0);
+    const param = new URLSearchParams(window.location.search).get('img');
+    const parsed = param ? Number.parseInt(param, 10) : 0;
+    const validIdx =
+      Number.isFinite(parsed) && parsed >= 0 && parsed < product.images.length
+        ? parsed
+        : 0;
+    setImageIdx(validIdx);
     setSelectedSize(product.sizes[0] || 'Unique');
     setDeliveryCheck(null);
     setZoomOpen(false);
@@ -89,25 +103,50 @@ export function ProductDetailView({
   const images = product.images.length > 0 ? product.images : [''];
   const currentImage = images[imageIdx] ?? images[0];
 
-  // Bind currently viewed image to OpenGraph and Twitter meta tags in real-time
+  // Sync currently viewed image index in URL (?img=N) & OpenGraph/Twitter meta tags
   useEffect(() => {
+    const url = new URL(window.location.href);
+    if (imageIdx > 0) {
+      url.searchParams.set('img', String(imageIdx));
+    } else {
+      url.searchParams.delete('img');
+    }
+    const nextPathAndSearch = url.pathname + url.search;
+    if (window.location.pathname + window.location.search !== nextPathAndSearch) {
+      window.history.replaceState(window.history.state, '', nextPathAndSearch);
+    }
+
     const origin = window.location.origin;
-    const imageUrl = currentImage.startsWith('http') ? currentImage : `${origin}${currentImage}`;
+    const imageUrl = toAbsoluteShareImageUrl(currentImage, origin);
     const setMeta = (propertyAttr: string, attrName: string, value: string) => {
-      let el = document.querySelector(`meta[${propertyAttr}="${attrName}"]`);
+      const el = document.querySelector(`meta[${propertyAttr}="${attrName}"]`);
       if (el) el.setAttribute('content', value);
     };
     setMeta('property', 'og:image', imageUrl);
     setMeta('property', 'og:image:secure_url', imageUrl);
+    setMeta('property', 'og:image:type', 'image/jpeg');
+    setMeta('property', 'og:url', window.location.href);
     setMeta('name', 'twitter:image', imageUrl);
-  }, [currentImage]);
+  }, [currentImage, imageIdx]);
 
   const handleShare = async () => {
     soundFx.playSuccess();
+    const shareUrl = new URL(window.location.href);
+    if (imageIdx > 0) {
+      shareUrl.searchParams.set('img', String(imageIdx));
+    } else {
+      shareUrl.searchParams.delete('img');
+    }
+    const isBuiltIn = INITIAL_PRODUCTS.some((p) => p.id === product.id);
+    if (!isBuiltIn && currentImage.startsWith('/')) {
+      shareUrl.searchParams.set('title', `${product.name} — ${formatPriceFcfa(product.priceFcfa)}`);
+      shareUrl.searchParams.set('imgUrl', currentImage);
+    }
+
     const shareData = {
-      title: `${product.name} — Goma`,
+      title: `${product.name} — ${formatPriceFcfa(product.priceFcfa)} | Goma`,
       text: `${product.name} (${formatPriceFcfa(product.priceFcfa)}) sur Goma Delano Collection au Bénin.`,
-      url: window.location.href,
+      url: shareUrl.toString(),
     };
 
     try {
@@ -121,7 +160,7 @@ export function ProductDetailView({
 
     try {
       if (navigator.clipboard) {
-        await navigator.clipboard.writeText(window.location.href);
+        await navigator.clipboard.writeText(shareUrl.toString());
       }
       setShareCopied(true);
       window.setTimeout(() => setShareCopied(false), 2400);

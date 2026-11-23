@@ -385,6 +385,8 @@ const FALLBACK_IMAGES_BY_SEGMENT: Record<
     '/src/assets/images/product_manteau_argile_1795342522861.jpg',
   ],
   Chaussure: ['/src/assets/images/product_mocassins_cuir_1795346537039.jpg'],
+  Sacs: ['/src/assets/images/prod_sac_bandouliere_ivoire_1795442302858.jpg'],
+  Bijoux: ['/src/assets/images/prod_collier_laiton_marte_1795442301646.jpg'],
   Enfant: ['/src/assets/images/product_chemise_enfant_1795346537168.jpg'],
   Accessoires: [
     '/src/assets/images/product_sac_cuir_1795342521974.jpg',
@@ -483,6 +485,8 @@ const VALID_SEGMENTS: MarketSegment[] = [
   'Homme',
   'Femme',
   'Chaussure',
+  'Sacs',
+  'Bijoux',
   'Enfant',
   'Accessoires',
 ];

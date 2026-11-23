@@ -105,7 +105,7 @@ export function HeroSection({
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 font-body">
             <span>Neuf &amp; Friperie 1er choix</span>
             <span aria-hidden="true" className="text-[#F2E9DA]/40">·</span>
-            <span>Homme, Femme, Chaussure &amp; Enfant</span>
+            <span>Mode, Chaussures, Sacs &amp; Bijoux</span>
             <span aria-hidden="true" className="text-[#F2E9DA]/40">·</span>
             <span>Cotonou &amp; Abomey-Calavi</span>
           </div>

@@ -18,6 +18,7 @@ export default defineConfig(() => {
           'favicon-32x32.png',
           'apple-touch-icon.png',
           'icon.svg',
+          'og-image.jpg',
           'og-image.png',
           'robots.txt',
           'sitemap.xml',
@@ -112,6 +113,16 @@ export default defineConfig(() => {
           if (fs.existsSync(distDir) && fs.existsSync(srcAssets)) {
             fs.cpSync(srcAssets, distAssets, {recursive: true, force: true});
           }
+          const builtHtml = path.join(distDir, 'index.html');
+          const apiShellHtml = path.resolve(__dirname, 'api/_shell.html');
+          if (fs.existsSync(builtHtml)) {
+            fs.mkdirSync(path.dirname(apiShellHtml), {recursive: true});
+            fs.copyFileSync(builtHtml, apiShellHtml);
+            // On Vercel, remove static dist/index.html so "/" routes through /api/render for dynamic OG tags
+            if (process.env.VERCEL === '1') {
+              fs.rmSync(builtHtml, {force: true});
+            }
+          }
         },
       },
     ],
@@ -130,6 +141,7 @@ export default defineConfig(() => {
       hmr: process.env.DISABLE_HMR !== 'true',
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
+      ...(process.env.DISABLE_HMR === 'true' ? { ws: false as const } : {}),
     },
   };
 });

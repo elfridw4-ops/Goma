@@ -218,3 +218,22 @@ test('URL search state serializes and parses filters and assistant tab safely', 
     { tab: 'seller' },
   );
 });
+
+test('INITIAL_PRODUCTS has 32 doubled entries with strictly unique images, new ranges, and valid FCFA prices', () => {
+  assert.equal(INITIAL_PRODUCTS.length, 32);
+
+  const primaryImages = INITIAL_PRODUCTS.map((p) => p.images[0]);
+  const uniqueImages = new Set(primaryImages);
+  assert.equal(uniqueImages.size, INITIAL_PRODUCTS.length);
+
+  const segments = new Set(INITIAL_PRODUCTS.map((p) => p.segment));
+  assert.ok(segments.has('Chaussure'));
+  assert.ok(segments.has('Bijoux'));
+  assert.ok(segments.has('Sacs'));
+
+  for (const p of INITIAL_PRODUCTS) {
+    assert.ok(p.priceFcfa >= 500 && p.priceFcfa <= 50000);
+    assert.ok(p.description.trim().length >= 20);
+    assert.ok(p.images.length >= 1 && p.images[0].startsWith('/src/assets/images/'));
+  }
+});

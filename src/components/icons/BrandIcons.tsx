@@ -1,7 +1,9 @@
 import {
   Banknote,
+  Briefcase,
   CreditCard,
   Footprints,
+  Gem,
   LayoutGrid,
   Shirt,
   ShoppingBag,
@@ -118,6 +120,10 @@ export function SegmentIcon({
       return <Sparkles {...iconProps} />;
     case 'Chaussure':
       return <Footprints {...iconProps} />;
+    case 'Sacs':
+      return <Briefcase {...iconProps} />;
+    case 'Bijoux':
+      return <Gem {...iconProps} />;
     case 'Enfant':
       return <ShoppingBag {...iconProps} />;
     case 'Accessoires':
