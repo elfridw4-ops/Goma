@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import fs from 'fs';
 import path from 'path';
+import { buildSync as esbuildSync } from 'esbuild';
 import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
@@ -119,9 +120,25 @@ export default defineConfig(() => {
             fs.mkdirSync(path.dirname(apiShellHtml), {recursive: true});
             fs.copyFileSync(builtHtml, apiShellHtml);
             // On Vercel, remove static dist/index.html so "/" routes through /api/render for dynamic OG tags
-            if (process.env.VERCEL === '1') {
+            if (process.env.VERCEL === '1' || process.env.VERCEL === 'true') {
               fs.rmSync(builtHtml, {force: true});
             }
+          }
+
+          // Bundle OG resolver into a self-contained ESM module for Vercel Node runtime (/api/render.ts)
+          const ogEntry = path.resolve(__dirname, 'src/utils/ogMeta.ts');
+          const apiOgOut = path.resolve(__dirname, 'api/_ogMeta.mjs');
+          if (fs.existsSync(ogEntry)) {
+            fs.mkdirSync(path.dirname(apiOgOut), {recursive: true});
+            esbuildSync({
+              entryPoints: [ogEntry],
+              outfile: apiOgOut,
+              bundle: true,
+              format: 'esm',
+              platform: 'node',
+              target: 'node20',
+              minify: true,
+            });
           }
         },
       },

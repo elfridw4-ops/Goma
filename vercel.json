@@ -4,7 +4,7 @@
   "outputDirectory": "dist",
   "functions": {
     "api/render.ts": {
-      "includeFiles": "api/_shell.html"
+      "includeFiles": "api/_*"
     }
   },
   "rewrites": [

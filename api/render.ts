@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { injectOgIntoHtml, normalizeBaseUrl, resolveOgMeta } from '../src/utils/ogMeta';
+import { injectOgIntoHtml, normalizeBaseUrl, resolveOgMeta } from './_ogMeta.mjs';
 
 interface ServerlessRequest {
   method?: string;
