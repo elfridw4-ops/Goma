@@ -20,9 +20,6 @@
 
 ## Boutiques Partenaires
 
-- **Delano Cotonou** (Haie Vive, Cotonou) : Spécialiste prêt-à-porter atelier, gabardine, lin naturel et vestes structurées.
-- **Chic Frip** (Akpakpa, Cotonou) : Sélection friperie 1er choix, robes vérifiées, denim vintage et pièces uniques dès 500 F.
-- **Atelier Calavi** (Abomey-Calavi) : Maroquinerie artisanale, mocassins patinés, mailles légères et accessoires durables.
 
 ## Endpoints Techniques Publics
 

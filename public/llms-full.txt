@@ -3,8 +3,8 @@
 ## 1. Identité et Description de l'Entité
 - **Nom officiel :** Goma — Delano Collection
 - **Type d’organisation :** Marketplace de mode et plateforme d'e-commerce écoresponsable
-- **Siège opérationnel :** Haie Vive, Cotonou, République du Bénin
-- **Email de contact :** contact@delano-collection.bj
+- **Siège opérationnel :** 
+- **Email de contact :** 
 - **Langue principale :** Français (`fr`, `fr-BJ`)
 - **Monnaie :** Franc CFA Ouest-Africain (`XOF`, affiché en `FCFA` ou `F`)
 
@@ -14,12 +14,6 @@ Goma résout le paradoxe du vestiaire africain contemporain en unissant deux mod
 2. **La Friperie Sélectionnée (Frip 1er Choix) :** Pièces uniques chinées et vérifiées auprès de boutiques partenaires à Cotonou et Calavi. Prix accessibles dès 500 FCFA. Chaque article de friperie est strictement unique (stock unitaire = 1).
 
 ## 3. Zone Géographique et Logistique (Bénin)
-- **Cotonou :** Livraison express à domicile en 24h à 48h (tarif fixe 1 000 FCFA, offerte dès 25 000 FCFA d'achats).
-- **Abomey-Calavi :** Livraison en 24h à 48h (tarif fixe 1 500 FCFA, offerte dès 25 000 FCFA).
-- **Porto-Novo :** Livraison en 48h (tarif 2 000 FCFA).
-- **Ouidah :** Livraison en 48h à 72h (tarif 2 500 FCFA).
-- **Parakou :** Expédition par malle ou gare routière en 72h (tarif 3 500 FCFA).
-- **Retrait Boutique :** Retrait gratuit immédiat en point de vente partenaire (Cotonou Haie Vive, Akpakpa, Abomey-Calavi).
 
 ## 4. Modes de Paiement Intégrés
 - **MTN Mobile Money Bénin (MoMo) :** Règlement instantané via numéro de téléphone béninois.
